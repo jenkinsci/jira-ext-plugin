@@ -1,0 +1,28 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <!--
+        Used in global config screen
+        -->
+    <f:section title="jira-ext Config">
+
+        <f:entry title="JIRA Base URL" field="jiraBaseUrl"
+                 description="The base URL of Jira server, not ending with slash">
+            <f:textbox />
+        </f:entry>
+        <f:entry title="JIRA Username" field="username"
+                 description="The Jira bot username">
+            <f:textbox />
+        </f:entry>
+        <f:entry title="JIRA Password" field="password"
+                 description="The Jira bot password">
+            <f:textbox />
+        </f:entry>
+        <f:entry title="Ticket Pattern" field="pattern"
+                 description="Comma-separate string of jira prefixes">
+            <f:textbox default="FOO-,BAR-" />
+        </f:entry>
+        <f:entry title="Verbose Logging" field="verboseLogging"
+                 description="Whether to log a lot of information, ie API http debugging, in jobs">
+            <f:checkbox />
+        </f:entry>
+    </f:section>
+</j:jelly>

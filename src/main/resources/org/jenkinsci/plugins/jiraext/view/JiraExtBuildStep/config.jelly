@@ -1,0 +1,18 @@
+<j:jelly xmlns:j="jelly:core"
+         xmlns:st="jelly:stapler"
+         xmlns:d="jelly:define"
+         xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson"
+         xmlns:f="/lib/form">
+
+    <f:dropdownDescriptorSelector field="issueStrategy" title="Discover Issues By"
+                                  descriptors="${descriptor.getIssueStrategies()}"/>
+
+    <f:entry title="JIRA Operations">
+        <!-- TODO: switch to <f:repeatableHeteroList field="extensions"> -->
+        <f:hetero-list name="extensions" items="${instance.extensions}" descriptors="${descriptor.getExtensionDescriptors()}"
+                       hasHeader="true" />
+    </f:entry>
+
+</j:jelly>
+

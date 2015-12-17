@@ -1,0 +1,8 @@
+<?jelly escape-by-default='true'?>
+<!--
+  This view is used to render the installed plugins page.
+-->
+<div>
+  A plugin for Jenkins CI to update JIRA tickets in an extensible way: both what to update
+  and how to up date are exposed as Extension Points
+</div>
