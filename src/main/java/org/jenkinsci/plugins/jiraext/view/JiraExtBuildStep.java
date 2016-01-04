@@ -80,7 +80,7 @@ public class JiraExtBuildStep
         @Override
         public String getDisplayName()
         {
-            return "Update JIRA Issues";
+            return "Update JIRA Issues (jira-ext-plugin)";
         }
 
         public DescriptorExtensionList<IssueStrategyExtension, Descriptor<IssueStrategyExtension>> getIssueStrategies()
