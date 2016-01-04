@@ -25,6 +25,7 @@ The jira-ext plugin is meant to be extensible in ways that the jira-plugin is no
 In terms of specific features:
 
 jira-ext plugin:
+
 1. Specify issues manually
 2. Specify issues from upstream commits
 3. Transitions issues
@@ -33,11 +34,13 @@ jira-ext plugin:
 6. Customize comments on issues
 
 jira-plugin:
+
 1. Perform release notes
 2. (Deprecated) support for SOAP
 3. Specify issues from JQL
 4. Automatically link back to jenkins builds (backpointers)
 5. Link JIRA issues in the Jenkins UI
+
 
 # Extending the plugin
 
