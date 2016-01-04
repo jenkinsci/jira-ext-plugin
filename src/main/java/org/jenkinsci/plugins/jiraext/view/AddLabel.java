@@ -62,7 +62,7 @@ public class AddLabel
     {
         if (jiraClientSvc == null)
         {
-            new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
+            jiraClientSvc = new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
         }
         for (JiraCommit jiraCommit : JiraCommit.filterDuplicateIssues(jiraCommitList))
         {

@@ -62,7 +62,7 @@ public class Transition
     {
         if (jiraClientSvc == null)
         {
-            new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
+            jiraClientSvc = new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
         }
         try
         {

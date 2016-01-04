@@ -39,7 +39,7 @@ public class SingleTicketStrategy
 {
     private static final Logger _logger = Logger.getLogger(SingleTicketStrategy.class.getName());
 
-    private String issueKey;
+    public String issueKey;
 
     @DataBoundConstructor
     public SingleTicketStrategy(String issueKey)
@@ -73,5 +73,11 @@ public class SingleTicketStrategy
     public boolean equals(Object obj)
     {
         return obj != null && obj instanceof SingleTicketStrategy;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SingleTicketStrategy[issueKey=" + issueKey + "]";
     }
 }

@@ -23,7 +23,9 @@ import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -68,10 +70,11 @@ public class Config
             super();
             load();
         }
+
         @Override
         public String getDisplayName()
         {
-            return "Jira Commit Message Config";
+            return "Jira-ext Config";
         }
 
         public String getJiraBaseUrl()
@@ -131,6 +134,17 @@ public class Config
                 return new ArrayList<>();
             }
             return Arrays.asList(pattern.split(","));
+        }
+
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException
+        {
+            setJiraBaseUrl(formData.getString("jiraBaseUrl"));
+            setUsername(formData.getString("username"));
+            setPassword(formData.getString("password"));
+            setPattern(formData.getString("pattern"));
+            setVerboseLogging(formData.getBoolean("verboseLogging"));
+            return true;
         }
     }
 

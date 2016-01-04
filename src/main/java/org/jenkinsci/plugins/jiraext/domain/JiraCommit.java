@@ -37,14 +37,20 @@ public class JiraCommit
 
     public JiraCommit(String jiraTicket)
     {
-        this.jiraTicket = jiraTicket;
-        this.changeSet = Optional.absent();
+        this(jiraTicket, null);
     }
 
     public JiraCommit(String jiraTicket, ChangeLogSet.Entry changeSet)
     {
         this.jiraTicket = jiraTicket;
-        this.changeSet = Optional.of(changeSet);
+        if (changeSet == null)
+        {
+            this.changeSet = Optional.absent();
+        }
+        else
+        {
+            this.changeSet = Optional.of(changeSet);
+        }
     }
 
     public String getJiraTicket()

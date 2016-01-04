@@ -16,48 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  **************************************************************************/
-package org.jenkinsci.plugins.jiraext;
+package org.jenkinsci.plugins.jiraext.view;
 
-import org.junit.After;
+import hudson.model.FreeStyleProject;
+import org.jenkinsci.plugins.jiraext.Config;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.util.Arrays;
+
 /**
  * @author dalvizu
  */
-public class ConfigTest
+public class SingleTicketStrategyTest
 {
-
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
-
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-
+        Config.getGlobalConfig().setPattern("FOO-,BAR-");
     }
 
     @Test
     public void testSaveConfig()
-        throws Exception
+            throws Exception
     {
-        Config.PluginDescriptor before = Config.getGlobalConfig();
-        before.setPattern("FOO-");
-        before.setUsername("username");
-        before.setPassword("password");
-        before.setVerboseLogging(true);
-        jenkinsRule.configRoundtrip();
-        Config.PluginDescriptor after = Config.getGlobalConfig();
-        jenkinsRule.assertEqualBeans(before, after, "jiraBaseUrl,username,password,pattern,verboseLogging");
+        FreeStyleProject project = jenkinsRule.createFreeStyleProject();
+        JiraExtBuildStep builder = new JiraExtBuildStep(new SingleTicketStrategy("FOO-1"),
+                Arrays.asList((JiraOperationExtension) new AddComment(true, "Hello World")));
+        project.getBuildersList().add(builder);
 
+        jenkinsRule.submit(jenkinsRule.createWebClient().getPage(project, "configure").getFormByName("config"));
+
+        JiraExtBuildStep after = project.getBuildersList().get(JiraExtBuildStep.class);
+        jenkinsRule.assertEqualBeans(builder, after, "issueStrategy");
     }
 
 }

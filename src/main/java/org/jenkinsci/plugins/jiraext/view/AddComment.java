@@ -71,7 +71,7 @@ public class AddComment
     {
         if (jiraClientSvc == null)
         {
-            new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
+            jiraClientSvc = new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
         }
         for (JiraCommit jiraCommit : filterJiraCommitList(jiraCommitList))
         {
