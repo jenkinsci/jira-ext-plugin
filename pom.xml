@@ -19,7 +19,7 @@
 
   <description>A plugin for Jenkins CI to update JIRA tickets in an extensible way: both what to update
     and how to up date are exposed as Extension Points</description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/TODO+Plugin</url>
+  <url>https://wiki.jenkins-ci.org/display/JENKINS/Jira-Ext+Plugin</url>
   <licenses>
     <license>
       <name>Apache License</name>
@@ -36,18 +36,11 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/dalvizu/${project.artifactId}-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:dalvizu/${project.artifactId}-plugin.git</developerConnection>
-    <url>http://github.com/dalvizu/${project.artifactId}-plugin</url>
-  </scm>
-
-  <!-- Assuming you want to host on @jenkinsci:
-  <scm>
     <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
     <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
   </scm>
-   -->
+
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>
