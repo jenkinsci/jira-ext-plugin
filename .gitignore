@@ -7,3 +7,5 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 work/
+.idea/
+jira-ext.iml
