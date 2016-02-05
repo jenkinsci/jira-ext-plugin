@@ -1,5 +1,5 @@
 # jira-ext-plugin
-
+* [Wiki][wiki]
 * [Issue Tracking][issues]
 
 A plugin for Jenkins CI to update JIRA tickets in an extensible way: both what to update and how to update are exposed as `ExtensionPoint`s.
@@ -77,3 +77,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
  language governing permissions and limitations under the License.
  
 [issues]: https://issues.jenkins-ci.org/issues/?jql=project%20%3D%20JENKINS%20AND%20status%20in%20(Open%2C%20%22In%20Progress%22%2C%20Reopened)%20AND%20component%20%3D%20%27jira-ext-plugin%27
+[wiki]: https://wiki.jenkins-ci.org/display/JENKINS/Jira-Ext+Plugin
