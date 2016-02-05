@@ -9,6 +9,7 @@ Out of the box, you may discover issues by:
 * The issue key as the first word of the commit message
 * The issue key as the first word of the upstream commit message
 * Manually specifying an issue
+* Looking for it being mentioned somewhere in the commit message
 
 To all of these JIRA issues, you may:
 
