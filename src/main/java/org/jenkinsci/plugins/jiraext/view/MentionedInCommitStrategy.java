@@ -93,8 +93,7 @@ public class MentionedInCommitStrategy
                                 "Found commit: " + ((change == null) ? "null" : change.getCommitId()));
 
                     final List<String> jiraTickets = getJiraTickets(change,
-                                                                    Config.getGlobalConfig()
-                                                                        .getJiraTickets());
+                                                                    Config.getGlobalConfig().getJiraTickets());
 
                     if (!jiraTickets.isEmpty())
                     {
@@ -192,7 +191,7 @@ public class MentionedInCommitStrategy
         @Override
         public String getDisplayName()
         {
-            return "Mentioned somwhere in commit";
+            return "Mentioned somewhere in commit message";
         }
     }
 }
