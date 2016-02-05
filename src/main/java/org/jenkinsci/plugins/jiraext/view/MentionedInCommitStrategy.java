@@ -1,13 +1,3 @@
-/*
- * Copyright 2005-2016 chemmedia AG
- *
- * You should have received a copy of a license with this program. If not,
- * contact us by visiting http://www.chemmedia.de/ or write to chemmedia AG,
- * Parkstraße 35, 09120 Chemnitz, Germany.
- *
- * You may not use, copy, modify, sublicense, or distribute the Program or any
- * portion of it, except as expressly provided under the given license.
- */
 /***************************************************************************
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -61,51 +51,43 @@ import java.util.regex.Pattern;
  *
  * @author wiedsche
  */
-public class MentionedInCommitStrategy extends IssueStrategyExtension {
+public class MentionedInCommitStrategy
+        extends IssueStrategyExtension
+{
 
-    //~ Static fields/initializers ---------------------------------------------------------------------------
-
-    /**
-     * TODO DOCUMENT ME!
-     */
     private static final Logger _logger = Logger.getLogger(MentionedInCommitStrategy.class.getName());
-
-    //~ Constructors -----------------------------------------------------------------------------------------
 
     /**
      * Creates a new {@link MentionedInCommitStrategy} object.
      */
     @DataBoundConstructor
-    public MentionedInCommitStrategy() {
+    public MentionedInCommitStrategy()
+    {
         super();
     }
 
-    //~ Methods ----------------------------------------------------------------------------------------------
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         return (obj != null) && (obj instanceof MentionedInCommitStrategy);
     }
 
-    /**
-     * @see org.jenkinsci.plugins.jiraext.view.IssueStrategyExtension#getJiraCommits(hudson.model.AbstractBuild,
-     *      hudson.model.BuildListener)
-     */
     @Override
-    public List<JiraCommit> getJiraCommits(AbstractBuild build, BuildListener listener) {
+    public List<JiraCommit> getJiraCommits(AbstractBuild build, BuildListener listener)
+    {
         final List<JiraCommit> jiraCommits = new ArrayList<>();
 
-        try {
+        try
+        {
             _logger.log(Level.FINE, "+iterateTicketsAndApply");
 
             final ChangeLogSet changeSets = build.getChangeSet();
             listener.getLogger().println("ChangeLogSet class: " + changeSets.getClass());
 
-            for (final Object entry : changeSets) {
-                try {
+            for (final Object entry : changeSets)
+            {
+                try
+                {
                     final ChangeLogSet.Entry change = (ChangeLogSet.Entry) entry;
                     _logger.log(Level.FINE,
                                 "Found commit: " + ((change == null) ? "null" : change.getCommitId()));
@@ -114,25 +96,33 @@ public class MentionedInCommitStrategy extends IssueStrategyExtension {
                                                                     Config.getGlobalConfig()
                                                                         .getJiraTickets());
 
-                    if (!jiraTickets.isEmpty()) {
-                        for (String jiraTicket : jiraTickets) {
+                    if (!jiraTickets.isEmpty())
+                    {
+                        for (String jiraTicket : jiraTickets)
+                        {
                             _logger.log(Level.FINE, "Ticket discovered: " + jiraTicket);
                             _logger.log(Level.FINE, "Apply to ticket");
 
                             final JiraCommit commit = new JiraCommit(jiraTicket, change);
                             jiraCommits.add(commit);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         listener.getLogger().println("Unable to find valid Jira prefix in commit message. Valid prefixes are: " +
                                                          Config.getGlobalConfig().getJiraTickets() +
                                                          ", the commit message was: " + change.getMsg());
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     listener.getLogger().println("ERROR Updating jira notifications");
                     e.printStackTrace(listener.getLogger());
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             listener.getLogger().println("ERROR Updating jira notifications");
             e.printStackTrace(listener.getLogger());
         }
@@ -150,16 +140,20 @@ public class MentionedInCommitStrategy extends IssueStrategyExtension {
      *
      * @return
      */
-    private List<String> getJiraTickets(final ChangeLogSet.Entry change, final List<String> ticketPrefixes) {
+    private List<String> getJiraTickets(final ChangeLogSet.Entry change, final List<String> ticketPrefixes)
+    {
         final List<String> jiraTickets = new ArrayList<>();
 
-        for (String validJiraPrefix : ticketPrefixes) {
+        for (String validJiraPrefix : ticketPrefixes)
+        {
             String msg = change.getMsg();
 
-            while (StringUtils.isNotEmpty(msg)) {
+            while (StringUtils.isNotEmpty(msg))
+            {
                 final int foundPos = StringUtils.indexOf(msg, validJiraPrefix);
 
-                if (foundPos == -1) {
+                if (foundPos == -1)
+                {
                     break;
                 }
 
@@ -171,13 +165,15 @@ public class MentionedInCommitStrategy extends IssueStrategyExtension {
 
                 final String ticketNumber = matcher.group(1);
 
-                if (StringUtils.isEmpty(ticketNumber)) {
+                if (StringUtils.isEmpty(ticketNumber))
+                {
                     break;
                 }
 
                 final String resultingTicket = validJiraPrefix + ticketNumber;
 
-                if (!jiraTickets.contains(resultingTicket)) {
+                if (!jiraTickets.contains(resultingTicket))
+                {
                     jiraTickets.add(resultingTicket);
                 }
 
@@ -188,23 +184,14 @@ public class MentionedInCommitStrategy extends IssueStrategyExtension {
         return jiraTickets;
     }
 
-    //~ Inner Classes ----------------------------------------------------------------------------------------
-
-    /**
-     * TODO DOCUMENT ME!
-     *
-     * @author $author$
-     */
     @Extension
-    public static class DescriptorImpl extends IssueStrategyExtensionDescriptor {
+    public static class DescriptorImpl
+            extends IssueStrategyExtensionDescriptor
+    {
 
-        //~ Methods ------------------------------------------------------------------------------------------
-
-        /**
-         * @see hudson.model.Descriptor#getDisplayName()
-         */
         @Override
-        public String getDisplayName() {
+        public String getDisplayName()
+        {
             return "Mentioned somwhere in commit";
         }
     }
