@@ -25,6 +25,7 @@ import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import org.jenkinsci.plugins.jiraext.view.FirstWordOfCommitStrategy;
 import org.jenkinsci.plugins.jiraext.view.FirstWordOfUpstreamCommitStrategy;
 import org.jenkinsci.plugins.jiraext.view.IssueStrategyExtension;
+import org.jenkinsci.plugins.jiraext.view.MentionedInCommitStrategy;
 import org.jenkinsci.plugins.jiraext.view.SingleTicketStrategy;
 
 /**
@@ -52,6 +53,11 @@ public class IssueStrategyContext
     public void firstWordOfUpstreamCommit()
     {
         issueStrategy = new FirstWordOfUpstreamCommitStrategy();
+    }
+
+    public void mentionedInCommit()
+    {
+        issueStrategy = new MentionedInCommitStrategy();
     }
 
     /**
