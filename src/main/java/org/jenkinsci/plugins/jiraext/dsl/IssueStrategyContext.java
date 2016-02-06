@@ -19,26 +19,48 @@
 package org.jenkinsci.plugins.jiraext.dsl;
 
 import groovy.lang.Closure;
+import groovy.lang.MetaClass;
+import groovy.util.Node;
 import hudson.Extension;
-import javaposse.jobdsl.dsl.Context;
-import javaposse.jobdsl.plugin.ContextExtensionPoint;
+import javaposse.jobdsl.dsl.Item;
+import javaposse.jobdsl.dsl.JobManagement;
+import javaposse.jobdsl.dsl.helpers.AbstractExtensibleContext;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.jenkinsci.plugins.jiraext.view.FirstWordOfCommitStrategy;
 import org.jenkinsci.plugins.jiraext.view.FirstWordOfUpstreamCommitStrategy;
 import org.jenkinsci.plugins.jiraext.view.IssueStrategyExtension;
 import org.jenkinsci.plugins.jiraext.view.MentionedInCommitStrategy;
 import org.jenkinsci.plugins.jiraext.view.SingleTicketStrategy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author dalvizu
  */
 @Extension(optional=true)
 public class IssueStrategyContext
-        extends ContextExtensionPoint
-        implements Context
+        extends AbstractExtensibleContext
 {
+    // never persist the MetaClass
+    private transient MetaClass metaClass;
+
+    public IssueStrategyContext(JobManagement jobManagement, Item item) {
+        super(jobManagement, item);
+         this.metaClass = InvokerHelper.getMetaClass(this.getClass());
+    }
+
     IssueStrategyExtension issueStrategy;
 
     Closure withXmlClosure;
+
+    List<Node> issueStrategyNodes = new ArrayList<>();
+
+    @Override
+    protected void addExtensionNode(Node node)
+    {
+        issueStrategyNodes.add(node);
+    }
 
     public void singleIssue(String issueKey)
     {
@@ -69,4 +91,26 @@ public class IssueStrategyContext
         this.withXmlClosure = withXmlClosure;
     }
 
+    public Object getProperty(String property) {
+        return getMetaClass().getProperty(this, property);
+    }
+
+    public void setProperty(String property, Object newValue) {
+        getMetaClass().setProperty(this, property, newValue);
+    }
+
+    public Object invokeMethod(String name, Object args) {
+        return getMetaClass().invokeMethod(this, name, args);
+    }
+
+    public MetaClass getMetaClass() {
+        if (metaClass == null) {
+            metaClass = InvokerHelper.getMetaClass(getClass());
+        }
+        return metaClass;
+    }
+
+    public void setMetaClass(MetaClass metaClass) {
+        this.metaClass = metaClass;
+    }
 }

@@ -39,7 +39,8 @@ public class UpdateJiraExtContext
     List<JiraOperationExtension> extensions;
 
     public void issueStategy(Runnable closure) {
-        IssueStrategyContext context = new IssueStrategyContext();
+        IssueStrategyContext context = new IssueStrategyContext(jobManagement /* Compiler error */,
+                item /* compiler error */);
         executeInContext(closure, context);
         issueStrategy = context.issueStrategy;
     }
