@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
  * @author wiedsche
  */
 public class MentionedInCommitStrategy
-        extends IssueStrategyExtension
+        extends AbstractParsingIssueStrategy
 {
 
     private static final Logger _logger = Logger.getLogger(MentionedInCommitStrategy.class.getName());
@@ -72,62 +72,7 @@ public class MentionedInCommitStrategy
         return (obj != null) && (obj instanceof MentionedInCommitStrategy);
     }
 
-    @Override
-    public List<JiraCommit> getJiraCommits(AbstractBuild build, BuildListener listener)
-    {
-        final List<JiraCommit> jiraCommits = new ArrayList<>();
 
-        try
-        {
-            _logger.log(Level.FINE, "+iterateTicketsAndApply");
-
-            final ChangeLogSet changeSets = build.getChangeSet();
-            listener.getLogger().println("ChangeLogSet class: " + changeSets.getClass());
-
-            for (final Object entry : changeSets)
-            {
-                try
-                {
-                    final ChangeLogSet.Entry change = (ChangeLogSet.Entry) entry;
-                    _logger.log(Level.FINE,
-                                "Found commit: " + ((change == null) ? "null" : change.getCommitId()));
-
-                    final List<String> jiraTickets = getJiraTickets(change,
-                                                                    Config.getGlobalConfig().getJiraTickets());
-
-                    if (!jiraTickets.isEmpty())
-                    {
-                        for (String jiraTicket : jiraTickets)
-                        {
-                            _logger.log(Level.FINE, "Ticket discovered: " + jiraTicket);
-                            _logger.log(Level.FINE, "Apply to ticket");
-
-                            final JiraCommit commit = new JiraCommit(jiraTicket, change);
-                            jiraCommits.add(commit);
-                        }
-                    }
-                    else
-                    {
-                        listener.getLogger().println("Unable to find valid Jira prefix in commit message. Valid prefixes are: " +
-                                                         Config.getGlobalConfig().getJiraTickets() +
-                                                         ", the commit message was: " + change.getMsg());
-                    }
-                }
-                catch (Exception e)
-                {
-                    listener.getLogger().println("ERROR Updating jira notifications");
-                    e.printStackTrace(listener.getLogger());
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            listener.getLogger().println("ERROR Updating jira notifications");
-            e.printStackTrace(listener.getLogger());
-        }
-
-        return jiraCommits;
-    }
 
     /**
      * Parse Jira ticket numbers, ie SSD-101, out of the given ChangeLogSet.Entry.
@@ -135,15 +80,16 @@ public class MentionedInCommitStrategy
      * <p>Ticket number should be somewhere in the commit message</p>
      *
      * @param  change
-     * @param  ticketPrefixes
      *
      * @return
      */
-    private List<String> getJiraTickets(final ChangeLogSet.Entry change, final List<String> ticketPrefixes)
+    @Override
+    public List<JiraCommit> getJiraIssuesFromChangeSet(final ChangeLogSet.Entry change)
     {
-        final List<String> jiraTickets = new ArrayList<>();
+        final List<JiraCommit> result = new ArrayList<>();
+        final List<String> foundTickets = new ArrayList<>();
 
-        for (String validJiraPrefix : ticketPrefixes)
+        for (String validJiraPrefix : Config.getGlobalConfig().getJiraTickets())
         {
             String msg = change.getMsg();
 
@@ -171,16 +117,17 @@ public class MentionedInCommitStrategy
 
                 final String resultingTicket = validJiraPrefix + ticketNumber;
 
-                if (!jiraTickets.contains(resultingTicket))
+                if (!foundTickets.contains(resultingTicket))
                 {
-                    jiraTickets.add(resultingTicket);
+                    foundTickets.add(resultingTicket);
+                    result.add(new JiraCommit(resultingTicket, change));
                 }
 
                 msg = firstOccurrence;
             }
         }
 
-        return jiraTickets;
+        return result;
     }
 
     @Extension

@@ -18,9 +18,7 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import hudson.model.AbstractBuild;
 import hudson.model.FreeStyleProject;
-import hudson.model.StreamBuildListener;
 
 import hudson.scm.ChangeLogSet;
 
@@ -35,18 +33,11 @@ import org.jenkinsci.plugins.jiraext.Config;
 import org.jenkinsci.plugins.jiraext.MockChangeLogUtil;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.jvnet.hudson.test.JenkinsRule;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.nio.charset.Charset;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,39 +53,72 @@ public class MentionedInCommitStrategyTest
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
+    MentionedInCommitStrategy strategy;
+
     @Before
     public void setUp()
     {
         Config.getGlobalConfig().setPattern("FOO-,BAR-");
+        strategy = new MentionedInCommitStrategy();
     }
 
     @Test
-    public void testMentionedInCommit()
+    public void testSimpleCase()
             throws Exception
     {
-        MentionedInCommitStrategy strategy = new MentionedInCommitStrategy();
+        List<ChangeLogSet.Entry> validChanges = Arrays.asList(
+                MockChangeLogUtil.mockChangeLogSetEntry("Hello World [FOO-101]"),
+                MockChangeLogUtil.mockChangeLogSetEntry("FOO-101 ticket at start"),
+                MockChangeLogUtil.mockChangeLogSetEntry("In the middle FOO-101 of the message"),
+                MockChangeLogUtil.mockChangeLogSetEntry("Weird characters FOO-101: next to it"));
+        for (ChangeLogSet.Entry change : validChanges)
+        {
+            assertThat(strategy.getJiraIssuesFromChangeSet(change).size(), equalTo(1));
+            assertThat(strategy.getJiraIssuesFromChangeSet(change).get(0).getJiraTicket(), equalTo("FOO-101"));
+        }
 
-        ChangeLogSet mockChangeSet = MockChangeLogUtil.mockChangeLogSet(
-                new MockChangeLogUtil.MockChangeLog("FOO-101 first", "knork"),
-                new MockChangeLogUtil.MockChangeLog("[BAR-102] with square brackets", "zark"),
-                new MockChangeLogUtil.MockChangeLog("Fixed FOO-103 inbetween", "flarp"),
-                new MockChangeLogUtil.MockChangeLog("Fixed BAR-104typo", "narf"),
-                new MockChangeLogUtil.MockChangeLog("FOO-101 again but, because FOO-101 was invalid, but FOO-105 not", "knork"),
-                new MockChangeLogUtil.MockChangeLog("Invalid [foo-103] lowercase", "flarp"),
-                new MockChangeLogUtil.MockChangeLog("No Valid Ticket", "build robot"));
-        AbstractBuild mockBuild = mock(AbstractBuild.class);
-        when(mockBuild.getChangeSet()).thenReturn(mockChangeSet);
+    }
 
-        List<JiraCommit> commits = strategy.getJiraCommits(mockBuild,
-                new StreamBuildListener(System.out, Charset.defaultCharset()));
+    @Test
+    public void testNotFound()
+            throws Exception
+    {
+        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("SSD-101 test");
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(0));
+    }
 
-        assertEquals(commits.size(), 6);
+    @Test
+    public void testLowerCase()
+    {
+        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("foo-101 test");
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(0));
+    }
 
-        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-101"))));
-        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-102"))));
-        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-103"))));
-        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-104"))));
-        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-105"))));
+    @Test
+    public void testMultipleTicketNames()
+    {
+        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("FOO-101 and BAR-101 are both in the message");
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(2));
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry),
+                hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-101"))));
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry),
+                hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-101"))));
+    }
+
+    @Test
+    public void testInvalid()
+    {
+        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("Fixed BAR-104typo");
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(1));
+    }
+
+    @Test
+    public void testTicketRepeatsItself()
+    {
+        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("FOO-101 is in the message twice FOO-101");
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(1));
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry),
+                hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-101"))));
     }
 
     @Test

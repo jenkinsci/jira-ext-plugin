@@ -28,6 +28,7 @@ import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +45,7 @@ import java.util.logging.Logger;
  * @author dalvizu
  */
 public class FirstWordOfCommitStrategy
-    extends IssueStrategyExtension
+    extends AbstractParsingIssueStrategy
 {
     private static final Logger _logger = Logger.getLogger(FirstWordOfCommitStrategy.class.getName());
 
@@ -59,18 +60,17 @@ public class FirstWordOfCommitStrategy
      *
      * Ticket number is assumed to be the first word of the commit message
      *
-     * @param change
-     * @param ticketPrefixes
+     * @param change - the change entry to
      * @return
      */
-    private String getJiraTicket(final ChangeLogSet.Entry change,
-                                       final List<String> ticketPrefixes)
+    @Override
+    public List<JiraCommit> getJiraIssuesFromChangeSet(final ChangeLogSet.Entry change)
     {
         String msg = change.getMsg();
         String firstWordOfTicket;
         firstWordOfTicket = msg.substring(0, (msg.contains(" ") ? StringUtils.indexOf(msg, " ") : msg.length()));
 
-        for (String validJiraPrefix : ticketPrefixes)
+        for (String validJiraPrefix : Config.getGlobalConfig().getJiraTickets())
         {
             if (firstWordOfTicket.endsWith(":"))
             {
@@ -78,55 +78,11 @@ public class FirstWordOfCommitStrategy
             }
             if (firstWordOfTicket.startsWith(validJiraPrefix))
             {
-                return firstWordOfTicket;
+                return Arrays.asList(new JiraCommit(firstWordOfTicket, change));
             }
         }
+
         return null;
-    }
-
-    @Override
-    public List<JiraCommit> getJiraCommits(AbstractBuild build,
-                                           BuildListener listener)
-    {
-        List<JiraCommit> jiraCommits = new ArrayList<>();
-
-        try
-        {
-            _logger.log(Level.FINE, "+iterateTicketsAndApply");
-            ChangeLogSet changeSets = build.getChangeSet();
-            listener.getLogger().println("ChangeLogSet class: " + changeSets.getClass());
-
-            for (Object entry : changeSets)
-            {
-                try
-                {
-                    ChangeLogSet.Entry change = (ChangeLogSet.Entry) entry;
-                    _logger.log(Level.FINE, "Found commit: " + (change == null ? "null" : change.getCommitId()));
-                    String jiraTicket = getJiraTicket(change, Config.getGlobalConfig().getJiraTickets());
-                    if (jiraTicket != null)
-                    {
-                        _logger.log(Level.FINE, "Ticket discovered: " + jiraTicket);
-                            _logger.log(Level.FINE, "Apply to ticket");
-                        JiraCommit commit = new JiraCommit(jiraTicket, change);
-                        jiraCommits.add(commit);
-                    } else
-                    {
-                        listener.getLogger().println("Unable to find valid Jira prefix in commit message. Valid prefixes are: "
-                                + Config.getGlobalConfig().getJiraTickets() + ", the commit message was: " + change.getMsg());
-                    }
-                }
-                catch (Exception e)
-                {
-                    listener.getLogger().println("ERROR Updating jira notifications");
-                    e.printStackTrace(listener.getLogger());
-                }
-            }
-        } catch (Exception e)
-        {
-            listener.getLogger().println("ERROR Updating jira notifications");
-            e.printStackTrace(listener.getLogger());
-        }
-        return jiraCommits;
     }
 
     @Extension
