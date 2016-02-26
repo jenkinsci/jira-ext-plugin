@@ -24,9 +24,16 @@ import net.rcarz.jiraclient.Field;
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.JiraClient;
 import net.rcarz.jiraclient.JiraException;
+import net.rcarz.jiraclient.Project;
+import net.rcarz.jiraclient.Version;
 import org.apache.commons.lang.Validate;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientFactory;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 
 /**
  * @author dalvizu
@@ -35,6 +42,8 @@ import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 public final class JiraClientSvcImpl
     implements JiraClientSvc
 {
+
+    private Logger logger = Logger.getLogger(getClass().getSimpleName());
 
     private JiraClientFactory jiraClientFactory;
 
@@ -55,42 +64,104 @@ public final class JiraClientSvcImpl
     }
 
     @Override
-    public void addCommentToTicket(String jiraTicketNumber, String comment) throws JiraException
+    public void addCommentToTicket(String jiraIssueKey, String comment) throws JiraException
     {
+        logger.fine("Add comment to ticket: " + jiraIssueKey + " comment: " + comment);
         JiraClient client = newJiraClient();
-        client.getIssue(jiraTicketNumber).addComment(comment);
+        client.getIssue(jiraIssueKey).addComment(comment);
     }
 
     @Override
-    public void addLabelToTicket(String jiraTicketNumber, String labelsToAdd) throws JiraException
+    public void addLabelToTicket(String jiraIssueKey, String labelsToAdd) throws JiraException
     {
+        logger.fine("Add label to ticket: " + jiraIssueKey + " label: " + labelsToAdd);
+
         JiraClient client = newJiraClient();
-        Issue issue = client.getIssue(jiraTicketNumber);
+        Issue issue = client.getIssue(jiraIssueKey);
         for (String labelToAdd : labelsToAdd.split(" "))
         {
-            if (!issue.getLabels().contains(labelToAdd))
+            if (issue.getLabels().contains(labelToAdd))
             {
+                logger.fine("Label already exists on ticket, skipping");
+            }
+            else
+            {
+                logger.fine("Adding label: " + labelToAdd);
                 issue.update().fieldAdd(Field.LABELS, labelToAdd).execute();
             }
         }
     }
 
     @Override
-    public void changeWorkflowOfTicket(String jiraTicketNumber, String transitionName) throws JiraException
+    public void changeWorkflowOfTicket(String jiraIssueKey, String transitionName) throws JiraException
     {
+        logger.fine("Transition ticket: " + jiraIssueKey + " transition name: " + transitionName);
         JiraClient jiraClient = newJiraClient();
-        Issue issue = jiraClient.getIssue(jiraTicketNumber);
+        Issue issue = jiraClient.getIssue(jiraIssueKey);
         issue.transition().execute(transitionName);
     }
 
     @Override
-    public void updateField(String jiraTicketNumber, String jiraFieldName,
+    public void updateField(String jiraIssueKey, String jiraFieldName,
                             String content)
             throws JiraException
     {
+        logger.fine("Update ticket: " + jiraIssueKey + " field name: " + jiraFieldName + " with content " + content);
+
         JiraClient client = newJiraClient();
-        Issue issue = client.getIssue(jiraTicketNumber);
+        Issue issue = client.getIssue(jiraIssueKey);
         Validate.notNull(issue);
         issue.update().field(jiraFieldName, content).execute();
+    }
+
+    @Override
+    public void addFixVersion(String jiraIssueKey, String newFixVersion)
+            throws JiraException
+    {
+        logger.fine("Add fix version " + newFixVersion + " to ticket: " + jiraIssueKey);
+        JiraClient client = newJiraClient();
+        Issue issue = client.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
+        List<Version> existingVersions = issue.getFixVersions();
+        for (Version version : existingVersions)
+        {
+            logger.fine("found version: " + version.getName() + " id: " + version.getId());
+            if (version.getName().equals(newFixVersion))
+            {
+                logger.fine("Fix version is already on the ticket, skipping");
+                return;
+            }
+        }
+        Project project = issue.getProject();
+        Validate.notNull(project);
+        logger.fine("Finding project with key: " + project.getKey());
+        project = Project.get(client.getRestClient(), project.getKey());
+        Validate.notNull(project);
+        List<Version> projectVersions = project.getVersions();
+        Version newVersion = getVersion(projectVersions, newFixVersion);
+        existingVersions.add(newVersion);
+        issue.update().field(Field.FIX_VERSIONS, existingVersions).execute();
+    }
+
+    /**
+     *
+     * @param projectVersions - list of Versions to look for a name
+     * @param name - the version.name to look for
+     * @return the first Version with the given name
+     * @throws JiraException when no Version with that name exists
+     */
+    private Version getVersion(List<Version> projectVersions, String name)
+        throws JiraException
+    {
+        List<String> foundVersionNames = new ArrayList();
+        for (Version version : projectVersions)
+        {
+            if (name.equals(version.getName()))
+            {
+                foundVersionNames.add(version.getName());
+                return version;
+            }
+        }
+        throw new JiraException("Unable to find version with name: " + name + ", only found versions named: " + foundVersionNames);
     }
 }

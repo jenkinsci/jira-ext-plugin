@@ -18,12 +18,15 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
+import com.google.inject.Inject;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
+import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
+import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 
 import java.util.List;
 
@@ -35,10 +38,28 @@ import java.util.List;
 public abstract class JiraOperationExtension
     extends AbstractDescribableImpl<JiraOperationExtension>
 {
+
     @Override
     public Descriptor<JiraOperationExtension> getDescriptor()
     {
         return super.getDescriptor();
+    }
+
+    private transient JiraClientSvc jiraClientSvc;
+
+    @Inject
+    public synchronized final void setJiraClientSvc(JiraClientSvc jiraClientSvc)
+    {
+        this.jiraClientSvc = jiraClientSvc;
+    }
+
+    public synchronized final JiraClientSvc getJiraClientSvc()
+    {
+        if (jiraClientSvc == null)
+        {
+            jiraClientSvc = new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
+        }
+        return jiraClientSvc;
     }
 
     public abstract void perform(List<JiraCommit> commits, AbstractBuild build, Launcher launcher, BuildListener listener);

@@ -18,7 +18,6 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import com.google.inject.Inject;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -32,37 +31,34 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.util.List;
 
 /**
- * Add a label to a JIRA issue
+ * Add a 'Fix Version' to a JIRA issue. The Fix Version must exist.
  *
  * @author dalvizu
  */
-public class AddLabel
-    extends JiraOperationExtension
+public class AddFixVersion
+        extends JiraOperationExtension
 {
 
-    public String labelName;
+    public String fixVersion;
 
     @DataBoundConstructor
-    public AddLabel(String labelName)
+    public AddFixVersion(String fixVersion)
     {
-        this.labelName = labelName;
+        this.fixVersion = fixVersion;
     }
 
     @Override
-    public void perform(List<JiraCommit> jiraCommitList,
-                        AbstractBuild build, Launcher launcher, BuildListener listener)
+    public void perform(List<JiraCommit> commits, AbstractBuild build, Launcher launcher, BuildListener listener)
     {
-        for (JiraCommit jiraCommit : JiraCommit.filterDuplicateIssues(jiraCommitList))
+        for (JiraCommit commit : JiraCommit.filterDuplicateIssues(commits))
         {
-            listener.getLogger().println("Add label to ticket: " + jiraCommit.getJiraTicket());
-            listener.getLogger().println("Label: " + labelName);
             try
             {
-                getJiraClientSvc().addLabelToTicket(jiraCommit.getJiraTicket(), labelName);
+                getJiraClientSvc().addFixVersion(commit.getJiraTicket(), fixVersion);
             }
             catch (Throwable t)
             {
-                listener.getLogger().println("ERROR Updating jira notifications");
+                listener.getLogger().println("ERROR Updating fix versions, skipping");
                 t.printStackTrace(listener.getLogger());
             }
         }
@@ -71,28 +67,22 @@ public class AddLabel
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null || !(obj instanceof AddLabel))
-        {
-            return false;
+        if (obj instanceof AddFixVersion){
+            AddFixVersion other = (AddFixVersion)obj;
+            return StringUtils.equals(other.fixVersion, this.fixVersion);
         }
-        AddLabel other = (AddLabel)obj;
-        return StringUtils.equals(labelName, other.labelName);
+        return false;
     }
 
-    @Override
-    public String toString()
-    {
-        return "AddLabel[labelName=" + labelName + "]";
-    }
-
-    @Extension
+    @Extension(optional=true)
     public static class DescriptorImpl
-        extends JiraOperationExtensionDescriptor {
+        extends JiraOperationExtensionDescriptor
+    {
 
         @Override
         public String getDisplayName()
         {
-            return "Add a label";
+            return "Add a Fix Version";
         }
     }
 }

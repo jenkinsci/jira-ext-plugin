@@ -50,8 +50,6 @@ public class AddComment
 
     public final String commentText;
 
-    private JiraClientSvc jiraClientSvc;
-
     @DataBoundConstructor
     public AddComment(boolean postCommentForEveryCommit, String commentText)
     {
@@ -59,20 +57,11 @@ public class AddComment
         this.commentText = commentText;
     }
 
-    @Inject
-    public void setJiraClientSvc(JiraClientSvc jiraClientSvc)
-    {
-        this.jiraClientSvc = jiraClientSvc;
-    }
-
     @Override
     public void perform(List<JiraCommit> jiraCommitList,
                         AbstractBuild build, Launcher launcher, BuildListener listener)
     {
-        if (jiraClientSvc == null)
-        {
-            jiraClientSvc = new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
-        }
+
         for (JiraCommit jiraCommit : filterJiraCommitList(jiraCommitList))
         {
             try
@@ -86,7 +75,7 @@ public class AddComment
                     listener.getLogger().println("\tchange.getCommitId()\t" + entry.getCommitId());
                     listener.getLogger().println("\tchange.getAuthor()\t" + entry.getAuthor());
                 }
-                jiraClientSvc.addCommentToTicket(jiraCommit.getJiraTicket(),
+                getJiraClientSvc().addCommentToTicket(jiraCommit.getJiraTicket(),
                         buildComment(jiraCommit.getChangeSet(), build.getEnvironment(listener)));
             }
             catch (Throwable t)

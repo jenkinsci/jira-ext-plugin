@@ -53,24 +53,14 @@ public class UpdateField
         this.fieldValue = fieldValue;
     }
 
-    @Inject
-    public void setJiraClientSvc(JiraClientSvc jiraClientSvc)
-    {
-        this.jiraClientSvc = jiraClientSvc;
-    }
-
     @Override
     public void perform(List<JiraCommit> commits, AbstractBuild build, Launcher launcher, BuildListener listener)
     {
-        if (jiraClientSvc == null)
-        {
-            jiraClientSvc = GuiceSingleton.get().getInjector().getInstance(JiraClientSvc.class);
-        }
         for (JiraCommit commit : JiraCommit.filterDuplicateIssues(commits))
         {
             try
             {
-                jiraClientSvc.updateField(commit.getJiraTicket(), fieldName, fieldValue);
+                getJiraClientSvc().updateField(commit.getJiraTicket(), fieldName, fieldValue);
             }
             catch (Throwable t)
             {

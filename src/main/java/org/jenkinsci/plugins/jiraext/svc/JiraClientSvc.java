@@ -51,4 +51,14 @@ public interface JiraClientSvc
     void changeWorkflowOfTicket(String jiraIssueKey, String transitionName) throws JiraException;
 
     void updateField(String jiraTicketNumber, String fieldName, String fieldContent) throws JiraException;
+
+    /**
+     * Add a Fix Version to a field, if it doesn't already exist.
+     *
+     * @param jiraIssueKey
+     * @param newFixVersion
+     * @throws JiraException if the fix version or issue does not exist, or if there was a problem getting the issue
+     */
+    void addFixVersion(String jiraIssueKey, String newFixVersion)
+            throws JiraException;
 }

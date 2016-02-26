@@ -42,28 +42,16 @@ public class Transition
 
     public String transitionName;
 
-    private JiraClientSvc jiraClientSvc;
-
     @DataBoundConstructor
     public Transition(String transitionName)
     {
         this.transitionName = transitionName;
     }
 
-    @Inject
-    public void setJiraClientSvc(JiraClientSvc jiraClientSvc)
-    {
-        this.jiraClientSvc = jiraClientSvc;
-    }
-
     @Override
     public void perform(List<JiraCommit> jiraCommitList,
                         AbstractBuild build, Launcher launcher, BuildListener listener)
     {
-        if (jiraClientSvc == null)
-        {
-            jiraClientSvc = new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
-        }
         try
         {
             for (JiraCommit jiraCommit : JiraCommit.filterDuplicateIssues(jiraCommitList))
@@ -72,7 +60,7 @@ public class Transition
                 listener.getLogger().println("transitionName: " + transitionName);
                 try
                 {
-                    jiraClientSvc.changeWorkflowOfTicket(jiraCommit.getJiraTicket(), transitionName);
+                    getJiraClientSvc().changeWorkflowOfTicket(jiraCommit.getJiraTicket(), transitionName);
                 }
                 catch (Throwable t)
                 {

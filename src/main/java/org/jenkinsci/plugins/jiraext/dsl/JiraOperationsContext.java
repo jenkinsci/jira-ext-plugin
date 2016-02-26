@@ -22,6 +22,7 @@ import hudson.Extension;
 import javaposse.jobdsl.dsl.Context;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import org.jenkinsci.plugins.jiraext.view.AddComment;
+import org.jenkinsci.plugins.jiraext.view.AddFixVersion;
 import org.jenkinsci.plugins.jiraext.view.AddLabel;
 import org.jenkinsci.plugins.jiraext.view.JiraOperationExtension;
 import org.jenkinsci.plugins.jiraext.view.Transition;
@@ -54,6 +55,10 @@ public class JiraOperationsContext
 
     public void updateField(String fieldName, String fieldValue) {
         extensions.add(new UpdateField(fieldName, fieldValue));
+    }
+
+    public void addFixVersion(String fixVersion) {
+        extensions.add(new AddFixVersion(fixVersion));
     }
 
 }
