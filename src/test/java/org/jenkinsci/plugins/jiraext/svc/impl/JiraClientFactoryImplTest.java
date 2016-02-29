@@ -18,38 +18,37 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.svc.impl;
 
-
-import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.JiraClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.jenkinsci.plugins.jiraext.Config;
-import org.jenkinsci.plugins.jiraext.svc.JiraClientFactory;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * Build a JiraClient from global configuration
- *
  * @author dalvizu
  */
-public class JiraClientFactoryImpl
-    implements JiraClientFactory
+public class JiraClientFactoryImplTest
 {
-
-    @Override
-    public JiraClient newJiraClient()
+    @Rule
+    public JenkinsRule jenkinsRule = new JenkinsRule();
+    
+    @Test
+    public void setup()
     {
-        Config.PluginDescriptor config = Config.getGlobalConfig();
-        String jiraUrl = config.getJiraBaseUrl();
-        String username = config.getUsername();
-        String password = config.getPassword();
+        Config.getGlobalConfig().setJiraBaseUrl("https://jira.localhost/local");
+        Config.getGlobalConfig().setUsername("JenkinsBot");
+        Config.getGlobalConfig().setPassword("ChangeMe!");
+        Config.getGlobalConfig().setTimeout(20);
 
-        BasicCredentials creds = new BasicCredentials(username, password);
-        JiraClient client = new JiraClient(jiraUrl, creds);
-        DefaultHttpClient httpClient = (DefaultHttpClient)client.getRestClient().getHttpClient();
-        int timeoutInSeconds = config.getTimeout();
-        HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), timeoutInSeconds * 1000);
-        HttpConnectionParams.setSoTimeout(httpClient.getParams(), timeoutInSeconds * 1000);
-        return client;
+        JiraClientFactoryImpl factory = new JiraClientFactoryImpl();
+        JiraClient jiraClient = factory.newJiraClient();
+        assertEquals("JenkinsBot", jiraClient.getSelf());
+        DefaultHttpClient defaultHttpClient = (DefaultHttpClient)jiraClient.getRestClient().getHttpClient();
+        assertEquals(20000, HttpConnectionParams.getConnectionTimeout(defaultHttpClient.getParams()));
+        assertEquals(20000, HttpConnectionParams.getSoTimeout(defaultHttpClient.getParams()));
     }
-
 }

@@ -64,6 +64,7 @@ public class Config
         private String password;
         private String pattern;
         private boolean verboseLogging;
+        private int timeout;
 
         public PluginDescriptor()
         {
@@ -144,7 +145,18 @@ public class Config
             setPassword(formData.getString("password"));
             setPattern(formData.getString("pattern"));
             setVerboseLogging(formData.getBoolean("verboseLogging"));
+            setTimeout(formData.getInt("timeout"));
             return true;
+        }
+
+        public void setTimeout(int timeoutInSeconds)
+        {
+            this.timeout = timeoutInSeconds;
+        }
+
+        public int getTimeout()
+        {
+            return timeout;
         }
     }
 
