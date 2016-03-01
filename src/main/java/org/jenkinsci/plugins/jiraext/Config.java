@@ -64,12 +64,21 @@ public class Config
         private String password;
         private String pattern;
         private boolean verboseLogging;
-        private int timeout;
+        private Integer timeout;
 
         public PluginDescriptor()
         {
             super();
             load();
+        }
+
+        public Object readResolve()
+        {
+            if (timeout == null)
+            {
+                timeout = 10;
+            }
+            return this;
         }
 
         @Override
@@ -149,12 +158,12 @@ public class Config
             return true;
         }
 
-        public void setTimeout(int timeoutInSeconds)
+        public void setTimeout(Integer timeoutInSeconds)
         {
             this.timeout = timeoutInSeconds;
         }
 
-        public int getTimeout()
+        public Integer getTimeout()
         {
             return timeout;
         }
