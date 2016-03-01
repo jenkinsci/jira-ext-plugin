@@ -155,7 +155,8 @@ public class Config
             setPattern(formData.getString("pattern"));
             setVerboseLogging(formData.getBoolean("verboseLogging"));
             setTimeout(formData.getInt("timeout"));
-            return true;
+            save();
+            return super.configure(req, formData);
         }
 
         public void setTimeout(Integer timeoutInSeconds)
