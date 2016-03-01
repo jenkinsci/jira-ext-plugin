@@ -5,7 +5,7 @@
          xmlns:t="/lib/hudson"
          xmlns:f="/lib/form">
 
-    <f:entry title="JIRA Field Name" field="fieldName">
+    <f:entry title="JIRA Field ID" field="fieldName">
         <f:textbox />
     </f:entry>
 
@@ -13,6 +13,70 @@
         <f:textarea />
     </f:entry>
 
+    <f:advanced title="Find Your Field ID">
+        <f:description>
+            <p>
+            You must identify the Field by its ID - for custom fields these
+            are not very friendly, for example 'customfield_123'. These are only exposed over API,
+            and are required over the API, but there does not appear to be any way where these are ever
+            correlated to their friendly names. If you know, please open a ticket! As far as I know, this
+            is a JIRA limitation.</p>
+
+            <p>Use the button below to see all of the field IDs of a particular issue to find the one you
+            want to use. </p>
+        </f:description>
+        <f:entry>
+            <script type="text/javascript"><![CDATA[
+                function populateJiraFields(checkUrl,paramList,button) {
+
+                    button = button._button;
+
+                    var parameters = {};
+
+                    paramList.split(',').each(function(name) {
+                        var p = findPreviousFormItem(button,name);
+                        if(p!=null) {
+                            if(p.type=="checkbox")  parameters[name] = p.checked;
+                            else                    parameters[name] = p.value;
+                        }
+                    });
+
+                    var spinner = $(button).up("DIV").next();
+                    var target = spinner.next();
+                    spinner.style.display="block";
+
+                    new Ajax.Request(checkUrl, {
+                        parameters: parameters,
+                        onComplete: function(rsp) {
+                            spinner.style.display="none";
+                            var i;
+                            target.innerHTML = rsp.status==200 ? rsp.responseText
+                            : '<a href="" onclick="document.getElementById(\'valerr' + (i=iota++)
+                                    + '\').style.display=\'block\';return false">ERROR</a><div id="valerr'
+                                    + i + '" style="display:none">' + rsp.responseText + '</div>';
+                            Behaviour.applySubtree(target);
+                            layoutUpdateCallback.call();
+                            var s = rsp.getResponseHeader("script");
+                            try {
+                                geval(s);
+                            } catch(e) {
+                                window.alert("failed to evaluate "+s+"\n"+e.message);
+                            }
+                        }
+                    });
+                }
+                ]]></script>
+        <div style="float:right">
+            Issue Key: <input type="text" name="issueKey"/><br/>
+            <input type="button" value="Find Field IDs" class="yui-button validate-button"
+                   onclick="populateJiraFields('${descriptor.descriptorFullUrl}/queryJiraFields', 'issueKey',this)" />
+        </div>
+        <div style="display:none;">
+            <img src="${imagesURL}/spinner.gif" /> ${attrs.progress}
+        </div>
+        <div><!-- this is where the error message goes --></div>
+        </f:entry>
+    </f:advanced>
 
 </j:jelly>
 

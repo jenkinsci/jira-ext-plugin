@@ -25,13 +25,20 @@ import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.JiraClient;
 import net.rcarz.jiraclient.JiraException;
 import net.rcarz.jiraclient.Project;
+import net.rcarz.jiraclient.RestClient;
 import net.rcarz.jiraclient.Version;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONString;
 import org.apache.commons.lang.Validate;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientFactory;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -141,6 +148,39 @@ public final class JiraClientSvcImpl
         Version newVersion = getVersion(projectVersions, newFixVersion);
         existingVersions.add(newVersion);
         issue.update().field(Field.FIX_VERSIONS, existingVersions).execute();
+    }
+
+    @Override
+    public Map<String, String> getJiraFields(String issueKey)
+            throws JiraException
+    {
+        logger.fine("Get JIRA field ids for key: " + issueKey);
+        Map<String, String> result = new HashMap<>();
+        JiraClient client = newJiraClient();
+        RestClient restClient = client.getRestClient();
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("expand", "renderedFields");
+            JSONObject json = (JSONObject)restClient.get("/rest/api/latest/issue/" + issueKey, params);
+            JSONObject fields = (JSONObject) json.get("renderedFields");
+
+            for (Object key : fields.keySet())
+            {
+                String fieldName = (String)key;
+                String fieldValue = "null";
+                if (fields.get(fieldName) != null)
+                {
+                    fieldValue = fields.get(fieldName).toString();
+                }
+                result.put(fieldName, fieldValue);
+
+            }
+
+            return result;
+        }
+        catch (Throwable t) {
+            throw new JiraException("Exception getting fields for JIRA issue", t);
+        }
     }
 
     /**

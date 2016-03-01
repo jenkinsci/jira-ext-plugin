@@ -20,6 +20,8 @@ package org.jenkinsci.plugins.jiraext.svc;
 
 import net.rcarz.jiraclient.JiraException;
 
+import java.util.Map;
+
 /**
  * @author dalvizu
  */
@@ -61,4 +63,13 @@ public interface JiraClientSvc
      */
     void addFixVersion(String jiraIssueKey, String newFixVersion)
             throws JiraException;
+
+    /**
+     * Get a map of fieldIds to fieldName for the given issue key
+     *
+     * @param issueKey
+     * @return a map of fieldIds to their fieldNames
+     */
+    Map<String, String> getJiraFields(String issueKey) throws JiraException;
+
 }

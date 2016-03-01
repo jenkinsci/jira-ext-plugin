@@ -23,13 +23,20 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.util.FormValidation;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.jiraext.Config;
 import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 import org.kohsuke.stapler.DataBoundConstructor;
-
+import org.kohsuke.stapler.ForwardToView;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.QueryParameter;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Update a Field on an Issue
@@ -39,12 +46,11 @@ import java.util.List;
 public class UpdateField
     extends JiraOperationExtension
 {
-    private JiraClientSvc jiraClientSvc;
-
     public String fieldName;
 
     public String fieldValue;
 
+    private static final Logger logger = Logger.getLogger(UpdateField.class.getSimpleName());
 
     @DataBoundConstructor
     public UpdateField(String fieldName, String fieldValue)
@@ -91,8 +97,45 @@ public class UpdateField
 
     @Extension
     public static class DescriptorImpl
-    extends JiraOperationExtensionDescriptor
+        extends JiraOperationExtensionDescriptor
     {
+
+        private transient JiraClientSvc jiraClientSvc;
+
+        @Inject
+        public synchronized final void setJiraClientSvc(JiraClientSvc jiraClientSvc)
+        {
+            this.jiraClientSvc = jiraClientSvc;
+        }
+
+        public synchronized final JiraClientSvc getJiraClientSvc()
+        {
+            if (jiraClientSvc == null)
+            {
+                jiraClientSvc = new GuiceSingleton().getInjector().getInstance(JiraClientSvc.class);
+            }
+            return jiraClientSvc;
+        }
+
+        public HttpResponse doQueryJiraFields(@QueryParameter String issueKey)
+        {
+            try
+            {
+                if (!Config.getGlobalConfig().isJiraConfigComplete())
+                {
+                    return FormValidation.error("JIRA settings are not set in global config");
+                }
+                final Map<String, String> jiraFields = getJiraClientSvc().getJiraFields(issueKey);
+                return new ForwardToView(this, "/org/jenkinsci/plugins/jiraext/view/UpdateField/jiraFields.jelly")
+                        .with("jiraFieldMap", jiraFields);
+            }
+            catch (Throwable t)
+            {
+                String message =  "Error finding FieldIds for issueKey: " + issueKey;
+                logger.log(Level.WARNING, message, t);
+                return FormValidation.error(t, message);
+            }
+        }
 
         @Override
         public String getDisplayName()
@@ -100,4 +143,5 @@ public class UpdateField
             return "Update a Field";
         }
     }
+
 }

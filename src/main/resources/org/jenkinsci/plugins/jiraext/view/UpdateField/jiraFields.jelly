@@ -1,0 +1,35 @@
+<j:jelly xmlns:j="jelly:core"
+         xmlns:st="jelly:stapler"
+         xmlns:d="jelly:define"
+         xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson"
+         xmlns:f="/lib/form">
+
+    <div>
+        Hello world!
+    </div>
+
+    <table>
+        <tr>
+            <th>
+                Field ID
+            </th>
+            <th>
+                Field Value
+            </th>
+        </tr>
+
+        <j:forEach items="${jiraFieldMap}" var="entry" indexVar="i">
+            <tr>
+                <td>
+                    ${entry.key}
+                </td>
+                <td>
+                    ${entry.value}
+                </td>
+            </tr>
+        </j:forEach>
+    </table>
+
+</j:jelly>
+

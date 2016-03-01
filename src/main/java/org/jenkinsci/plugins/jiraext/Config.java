@@ -158,6 +158,12 @@ public class Config
         {
             return timeout;
         }
+
+        public boolean isJiraConfigComplete()
+        {
+            return StringUtils.isNotEmpty(jiraBaseUrl) && StringUtils.isNotEmpty(username)
+                    && StringUtils.isNotEmpty(password);
+        }
     }
 
 }
