@@ -27,9 +27,8 @@ import net.rcarz.jiraclient.JiraException;
 import net.rcarz.jiraclient.Project;
 import net.rcarz.jiraclient.RestClient;
 import net.rcarz.jiraclient.Version;
-import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONString;
 import org.apache.commons.lang.Validate;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientFactory;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
@@ -54,7 +53,8 @@ public final class JiraClientSvcImpl
 
     private JiraClientFactory jiraClientFactory;
 
-    private JiraClient newJiraClient()
+    @Override
+    public JiraClient newJiraClient()
     {
         if (jiraClientFactory == null)
         {
@@ -109,7 +109,7 @@ public final class JiraClientSvcImpl
     }
 
     @Override
-    public void updateField(String jiraIssueKey, String jiraFieldName,
+    public void updateStringField(String jiraIssueKey, String jiraFieldName,
                             String content)
             throws JiraException
     {
@@ -119,6 +119,39 @@ public final class JiraClientSvcImpl
         Issue issue = client.getIssue(jiraIssueKey);
         Validate.notNull(issue);
         issue.update().field(jiraFieldName, content).execute();
+    }
+
+    @Override
+    public void updateMultiSelectField(String jiraIssueKey, String jiraFieldName, String... values)
+            throws JiraException
+    {
+        logger.fine("Update ticket: " + jiraIssueKey + " field name: " + jiraFieldName + " with values " + values);
+
+        JiraClient client = newJiraClient();
+        Issue issue = client.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
+        RestClient restClient = client.getRestClient();
+        try
+        {
+            JSONObject payload = new JSONObject();
+            JSONObject fields = new JSONObject();
+            JSONArray valueList = new JSONArray();
+            for (String value : values)
+            {
+                JSONObject shittyApi = new JSONObject();
+                shittyApi.put("value", value);
+                valueList.add(shittyApi);
+            }
+            fields.put(jiraFieldName, valueList);
+            payload.put("fields", fields);
+            restClient.put("/rest/api/latest/issue/" + jiraIssueKey, payload);
+        }
+        catch (Throwable t)
+        {
+            String msg = "Error updating multi-select issue field";
+            logger.log(Level.WARNING, msg, t);
+            throw new JiraException(msg, t);
+        }
     }
 
     @Override
@@ -159,10 +192,8 @@ public final class JiraClientSvcImpl
         JiraClient client = newJiraClient();
         RestClient restClient = client.getRestClient();
         try {
-            Map<String, String> params = new HashMap<>();
-            params.put("expand", "renderedFields");
-            JSONObject json = (JSONObject)restClient.get("/rest/api/latest/issue/" + issueKey, params);
-            JSONObject fields = (JSONObject) json.get("renderedFields");
+            JSONObject json = (JSONObject)restClient.get("/rest/api/latest/issue/" + issueKey);
+            JSONObject fields = (JSONObject) json.get("fields");
 
             for (Object key : fields.keySet())
             {
@@ -173,7 +204,6 @@ public final class JiraClientSvcImpl
                     fieldValue = fields.get(fieldName).toString();
                 }
                 result.put(fieldName, fieldValue);
-
             }
 
             return result;
@@ -181,6 +211,13 @@ public final class JiraClientSvcImpl
         catch (Throwable t) {
             throw new JiraException("Exception getting fields for JIRA issue", t);
         }
+    }
+
+    @Override
+    public Object getFieldValue(String jiraTicket, String jiraFieldId)
+            throws JiraException
+    {
+        return newJiraClient().getIssue(jiraTicket).getField(jiraFieldId);
     }
 
     /**

@@ -18,15 +18,26 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.svc;
 
+import net.rcarz.jiraclient.JiraClient;
 import net.rcarz.jiraclient.JiraException;
 
 import java.util.Map;
 
 /**
+ * Service to perform JIRA operations. Also able to get a JiraClient directly to do custom operations in
+ * your own {@link org.jenkinsci.plugins.jiraext.view.JiraOperationExtension}
+ *
  * @author dalvizu
  */
 public interface JiraClientSvc
 {
+
+    /**
+     * Create a new JiraClient from config, if you want to do some really custom JIRA operations
+     * using the rcarz client.
+     * @return a JiraClient configure with global config
+     */
+    JiraClient newJiraClient();
 
     /**
      * Add a comment to a ticket
@@ -52,7 +63,26 @@ public interface JiraClientSvc
      */
     void changeWorkflowOfTicket(String jiraIssueKey, String transitionName) throws JiraException;
 
-    void updateField(String jiraTicketNumber, String fieldName, String fieldContent) throws JiraException;
+    /**
+     * Update ticket ticket's field with a string value
+     *
+     * @param jiraTicketNumber
+     * @param fieldName
+     * @param fieldContent
+     * @throws JiraException
+     */
+    void updateStringField(String jiraTicketNumber, String fieldName, String fieldContent) throws JiraException;
+
+    /**
+     * Update a ticket's field with a multi-select value.
+     *
+     * @param jiraIssueKey
+     * @param jiraFieldName
+     * @param values
+     * @throws JiraException
+     */
+    void updateMultiSelectField(String jiraIssueKey, String jiraFieldName, String... values)
+            throws JiraException;
 
     /**
      * Add a Fix Version to a field, if it doesn't already exist.
@@ -71,5 +101,7 @@ public interface JiraClientSvc
      * @return a map of fieldIds to their fieldNames
      */
     Map<String, String> getJiraFields(String issueKey) throws JiraException;
+
+    Object getFieldValue(String jiraTicket, String jiraFieldId) throws JiraException;
 
 }
