@@ -102,7 +102,6 @@ public class UpdateField
 
         private transient JiraClientSvc jiraClientSvc;
 
-        @Inject
         public synchronized final void setJiraClientSvc(JiraClientSvc jiraClientSvc)
         {
             this.jiraClientSvc = jiraClientSvc;

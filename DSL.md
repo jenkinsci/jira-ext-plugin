@@ -8,7 +8,7 @@ job {
   steps {
     //...
     updateJiraExt {
-        issueStategy {
+        issueStrategy {
             singleIssue('JENKINS-101')
             // - or -
             firstWordOfCommit()
