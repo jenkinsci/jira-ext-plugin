@@ -12,9 +12,8 @@
                  description="The Jira bot username">
             <f:textbox />
         </f:entry>
-        <f:entry title="JIRA Password" field="password"
-                 description="The Jira bot password">
-            <f:textbox />
+        <f:entry title="JIRA Password">
+          <f:password field="password" description="The Jira bot password"/>
         </f:entry>
         <f:entry title="Ticket Pattern" field="pattern"
                  description="Comma-separate string of jira prefixes">
