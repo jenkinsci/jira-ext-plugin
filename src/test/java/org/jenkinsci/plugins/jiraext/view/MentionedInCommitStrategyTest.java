@@ -135,4 +135,13 @@ public class MentionedInCommitStrategyTest
         JiraExtBuildStep after = project.getBuildersList().get(JiraExtBuildStep.class);
         jenkinsRule.assertEqualBeans(builder, after, "issueStrategy");
     }
+
+    @Test
+    public void testJenkins33856()
+    {
+        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("Testing JIRA (ticket with a few spaces at the end and no EOL) FOO-141   ");
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(1));
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry),
+                hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-141"))));
+    }
 }
