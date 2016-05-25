@@ -18,14 +18,27 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
+import hudson.EnvVars;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
 import hudson.model.FreeStyleProject;
+import hudson.model.StreamBuildListener;
 import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author dalvizu
@@ -56,4 +69,31 @@ public class SingleTicketStrategyTest
         jenkinsRule.assertEqualBeans(builder, after, "issueStrategy");
     }
 
+    @Test
+    public void testExpansion()
+            throws Exception
+    {
+        AbstractBuild mockBuild = mock(AbstractBuild.class);
+        EnvVars envVars = new EnvVars();
+        envVars.put("FOO", "BAR");
+        when(mockBuild.getEnvironment(any(BuildListener.class))).thenReturn(envVars);
+        SingleTicketStrategy strategy = new SingleTicketStrategy("$FOO");
+        List<JiraCommit> commits = strategy.getJiraCommits(mockBuild, mock(BuildListener.class));
+        assertEquals(1, commits.size());
+        assertEquals("BAR", commits.get(0).getJiraTicket());
+    }
+
+    @Test
+    public void testErrorInExpansion()
+            throws Exception
+    {
+        AbstractBuild mockBuild = mock(AbstractBuild.class);
+        SingleTicketStrategy strategy = new SingleTicketStrategy("$FOO");
+        when(mockBuild.getEnvironment(any(BuildListener.class))).thenThrow(new IOException());
+        List<JiraCommit> commits = strategy.getJiraCommits(mockBuild,
+                new StreamBuildListener(System.out, Charset.defaultCharset()));
+        assertEquals(1, commits.size());
+        assertEquals("$FOO", commits.get(0).getJiraTicket());
+
+    }
 }

@@ -87,6 +87,23 @@ public class UpdateFieldTest
         verify(jiraClientSvc, times(1)).updateStringField(eq("SSD-101"), eq("CustomField_123"), eq("Completed"));
     }
 
+    @Test
+    public void testExpandValues()
+            throws Exception
+    {
+        UpdateField updateField = new UpdateField("CustomField_123", "Completed $FOO");
+        updateField.setJiraClientSvc(jiraClientSvc);
+        AbstractBuild mockBuild = mock(AbstractBuild.class);
+        EnvVars envVars = new EnvVars();
+        envVars.put("FOO", "BAR");
+        when(mockBuild.getEnvironment(any(TaskListener.class))).thenReturn(envVars);
+        List<JiraCommit> jiraCommits = new ArrayList<>();
+        jiraCommits.add(new JiraCommit("SSD-101", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
+
+        updateField.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
+        verify(jiraClientSvc, times(1)).updateStringField(eq("SSD-101"), eq("CustomField_123"), eq("Completed BAR"));
+    }
+
     /**
      * An exception adding the first label add should not disrupt the next label
      */

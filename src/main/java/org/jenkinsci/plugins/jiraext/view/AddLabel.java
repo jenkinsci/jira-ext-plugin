@@ -58,7 +58,8 @@ public class AddLabel
             listener.getLogger().println("Label: " + labelName);
             try
             {
-                getJiraClientSvc().addLabelToTicket(jiraCommit.getJiraTicket(), labelName);
+                String expandedName = build.getEnvironment(listener).expand(labelName);
+                getJiraClientSvc().addLabelToTicket(jiraCommit.getJiraTicket(), expandedName);
             }
             catch (Throwable t)
             {

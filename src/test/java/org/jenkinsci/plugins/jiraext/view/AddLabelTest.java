@@ -88,6 +88,24 @@ public class AddLabelTest
         verify(jiraClientSvc, times(1)).addLabelToTicket(eq("SSD-101"), eq("Test Label"));
     }
 
+    @Test
+    public void testExpandValues()
+            throws Exception
+    {
+        AddLabel addLabel = new AddLabel("Test Label $FOO");
+        addLabel.setJiraClientSvc(jiraClientSvc);
+
+        AbstractBuild mockBuild = mock(AbstractBuild.class);
+        EnvVars envVars = new EnvVars();
+        envVars.put("FOO", "BAR");
+        when(mockBuild.getEnvironment(any(TaskListener.class))).thenReturn(envVars);
+        List<JiraCommit> jiraCommits = new ArrayList<>();
+        jiraCommits.add(new JiraCommit("SSD-101", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
+
+        addLabel.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
+        verify(jiraClientSvc, times(1)).addLabelToTicket(eq("SSD-101"), eq("Test Label BAR"));
+    }
+
     /**
      * An exception adding the first label add should not disrupt the next label
      */

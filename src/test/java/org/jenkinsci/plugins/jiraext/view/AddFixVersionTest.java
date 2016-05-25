@@ -87,6 +87,25 @@ public class AddFixVersionTest
         verify(jiraClientSvc, times(1)).addFixVersion(eq("SSD-101"), eq("Beta Release"));
     }
 
+    @Test
+    public void testExpandValues()
+            throws Exception
+    {
+        AddFixVersion addFixVersion = new AddFixVersion("Beta Release $FOO");
+        addFixVersion.setJiraClientSvc(jiraClientSvc);
+        AbstractBuild mockBuild = mock(AbstractBuild.class);
+        EnvVars envVars = new EnvVars();
+        envVars.put("FOO", "BAR");
+        when(mockBuild.getEnvironment(any(TaskListener.class))).thenReturn(envVars);
+        List<JiraCommit> jiraCommits = new ArrayList<>();
+        jiraCommits.add(new JiraCommit("SSD-101"));
+        jiraCommits.add(new JiraCommit("SSD-101"));
+
+        addFixVersion.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
+        verify(jiraClientSvc, times(1)).addFixVersion(eq("SSD-101"), eq("Beta Release BAR"));
+
+    }
+
     /**
      * An exception updating a ticket should not impact other issues being updated
      */

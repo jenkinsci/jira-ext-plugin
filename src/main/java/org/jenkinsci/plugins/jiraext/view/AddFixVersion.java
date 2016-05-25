@@ -54,7 +54,8 @@ public class AddFixVersion
         {
             try
             {
-                getJiraClientSvc().addFixVersion(commit.getJiraTicket(), fixVersion);
+                String expandedFixVersion = build.getEnvironment(listener).expand(fixVersion);
+                getJiraClientSvc().addFixVersion(commit.getJiraTicket(), expandedFixVersion);
             }
             catch (Throwable t)
             {

@@ -24,6 +24,7 @@ import hudson.model.BuildListener;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -53,7 +54,16 @@ public class SingleTicketStrategy
                                            BuildListener listener)
     {
         List<JiraCommit> jiraCommits = new ArrayList<>();
-        jiraCommits.add(new JiraCommit(issueKey, null));
+        String expandedIssueKey = issueKey;
+        try
+        {
+            expandedIssueKey = build.getEnvironment(listener).expand(issueKey);
+        }
+        catch (IOException|InterruptedException e)
+        {
+            e.printStackTrace(listener.getLogger());
+        }
+        jiraCommits.add(new JiraCommit(expandedIssueKey, null));
         return jiraCommits;
     }
 

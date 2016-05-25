@@ -66,7 +66,8 @@ public class UpdateField
         {
             try
             {
-                getJiraClientSvc().updateStringField(commit.getJiraTicket(), fieldName, fieldValue);
+                String expandedValue = build.getEnvironment(listener).expand(fieldValue);
+                getJiraClientSvc().updateStringField(commit.getJiraTicket(), fieldName, expandedValue);
             }
             catch (Throwable t)
             {
