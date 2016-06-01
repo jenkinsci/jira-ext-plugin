@@ -1,4 +1,6 @@
-# jira-ext-plugin
+#jira-ext-plugin
+[![Build Status](https://jenkins.ci.cloudbees.com/buildStatus/icon?job=plugins/jira-ext-plugin)](https://jenkins.ci.cloudbees.com/job/plugins/job/jira-ext-plugin/)
+
 * [Wiki][wiki]
 * [Issue Tracking][issues]
 
