@@ -1,20 +1,17 @@
 /***************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
-
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Copyright (C) 2014 Ping Identity Corporation
+ * All rights reserved.
+ * <p/>
+ * The contents of this file are the property of Ping Identity Corporation.
+ * You may not copy or use this file, in either source code or executable
+ * form, except in compliance with terms set by Ping Identity Corporation.
+ * For further information please contact:
+ * <p/>
+ * Ping Identity Corporation
+ * 1001 17th Street Suite 100
+ * Denver, CO 80202
+ * 303.468.2900
+ * http://www.pingidentity.com
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
@@ -30,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,8 +41,9 @@ import static org.mockito.Mockito.when;
 /**
  * @author dalvizu
  */
-public class JiraBuildStepAdapterTest
+public class JiraPublisherStepTest
 {
+
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
@@ -53,33 +52,36 @@ public class JiraBuildStepAdapterTest
             throws Exception
     {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject();
-        JiraExtBuildStep builder = new JiraExtBuildStep(new FirstWordOfCommitStrategy(),
-                Arrays.asList((JiraOperationExtension)new AddComment(true, "Hello World")));
-        project.getBuildersList().add(builder);
+        JiraExtPublisherStep publisher = new JiraExtPublisherStep(new FirstWordOfCommitStrategy(),
+                Arrays.asList((JiraOperationExtension) new AddComment(true, "Hello World")));
+        project.getPublishersList().add(publisher);
 
         jenkinsRule.submit(jenkinsRule.createWebClient().getPage(project, "configure").getFormByName("config"));
 
-        JiraExtBuildStep after = project.getBuildersList().get(JiraExtBuildStep.class);
-        jenkinsRule.assertEqualBeans(builder, after, "issueStrategy");
+        JiraExtPublisherStep after = project.getPublishersList().get(JiraExtPublisherStep.class);
+        jenkinsRule.assertEqualBeans(publisher, after, "issueStrategy,extensions");
     }
 
     @Test
     public void testInvokeOperations()
+            throws Exception
     {
         IssueStrategyExtension mockStrategy = mock(IssueStrategyExtension.class);
         JiraOperationExtension mockOperation = mock(JiraOperationExtension.class);
         Descriptor mockDescriptor = mock(Descriptor.class);
         when(mockDescriptor.getDisplayName()).thenReturn("Mock descriptor");
         when(mockOperation.getDescriptor()).thenReturn(mockDescriptor);
-        JiraExtBuildStep builder = new JiraExtBuildStep(mockStrategy,
+        JiraExtPublisherStep publisher = new JiraExtPublisherStep(mockStrategy,
                 Arrays.asList(mockOperation));
         List<JiraCommit> commits = Arrays.asList(new JiraCommit("JENKINS-101",
-                        MockChangeLogUtil.mockChangeLogSetEntry("example ticket")));
+                MockChangeLogUtil.mockChangeLogSetEntry("example ticket")));
 
         when(mockStrategy.getJiraCommits(any(AbstractBuild.class), any(BuildListener.class)))
-                    .thenReturn(commits);
+                .thenReturn(commits);
 
-        assertTrue(builder.perform(mock(AbstractBuild.class), mock(Launcher.class), new StreamBuildListener(System.out)));
+        assertTrue(publisher.perform(mock(AbstractBuild.class), mock(Launcher.class),
+                new StreamBuildListener(System.out, Charset.defaultCharset())));
         verify(mockOperation).perform(eq(commits), any(AbstractBuild.class), any(Launcher.class), any(BuildListener.class));
     }
+
 }
