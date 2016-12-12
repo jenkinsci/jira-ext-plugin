@@ -30,6 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,8 +44,9 @@ import static org.mockito.Mockito.when;
 /**
  * @author dalvizu
  */
-public class JiraBuildStepAdapterTest
+public class JiraPublisherStepTest
 {
+
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
@@ -53,33 +55,36 @@ public class JiraBuildStepAdapterTest
             throws Exception
     {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject();
-        JiraExtBuildStep builder = new JiraExtBuildStep(new FirstWordOfCommitStrategy(),
-                Arrays.asList((JiraOperationExtension)new AddComment(true, "Hello World")));
-        project.getBuildersList().add(builder);
+        JiraExtPublisherStep publisher = new JiraExtPublisherStep(new FirstWordOfCommitStrategy(),
+                Arrays.asList((JiraOperationExtension) new AddComment(true, "Hello World")));
+        project.getPublishersList().add(publisher);
 
         jenkinsRule.submit(jenkinsRule.createWebClient().getPage(project, "configure").getFormByName("config"));
 
-        JiraExtBuildStep after = project.getBuildersList().get(JiraExtBuildStep.class);
-        jenkinsRule.assertEqualBeans(builder, after, "issueStrategy");
+        JiraExtPublisherStep after = project.getPublishersList().get(JiraExtPublisherStep.class);
+        jenkinsRule.assertEqualBeans(publisher, after, "issueStrategy,extensions");
     }
 
     @Test
     public void testInvokeOperations()
+            throws Exception
     {
         IssueStrategyExtension mockStrategy = mock(IssueStrategyExtension.class);
         JiraOperationExtension mockOperation = mock(JiraOperationExtension.class);
         Descriptor mockDescriptor = mock(Descriptor.class);
         when(mockDescriptor.getDisplayName()).thenReturn("Mock descriptor");
         when(mockOperation.getDescriptor()).thenReturn(mockDescriptor);
-        JiraExtBuildStep builder = new JiraExtBuildStep(mockStrategy,
+        JiraExtPublisherStep publisher = new JiraExtPublisherStep(mockStrategy,
                 Arrays.asList(mockOperation));
         List<JiraCommit> commits = Arrays.asList(new JiraCommit("JENKINS-101",
-                        MockChangeLogUtil.mockChangeLogSetEntry("example ticket")));
+                MockChangeLogUtil.mockChangeLogSetEntry("example ticket")));
 
         when(mockStrategy.getJiraCommits(any(AbstractBuild.class), any(BuildListener.class)))
-                    .thenReturn(commits);
+                .thenReturn(commits);
 
-        assertTrue(builder.perform(mock(AbstractBuild.class), mock(Launcher.class), new StreamBuildListener(System.out)));
+        assertTrue(publisher.perform(mock(AbstractBuild.class), mock(Launcher.class),
+                new StreamBuildListener(System.out, Charset.defaultCharset())));
         verify(mockOperation).perform(eq(commits), any(AbstractBuild.class), any(Launcher.class), any(BuildListener.class));
     }
+
 }
