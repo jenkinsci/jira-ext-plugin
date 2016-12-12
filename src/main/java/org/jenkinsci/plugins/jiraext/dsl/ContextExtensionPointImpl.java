@@ -19,11 +19,13 @@
 package org.jenkinsci.plugins.jiraext.dsl;
 
 import hudson.Extension;
+import javaposse.jobdsl.dsl.helpers.publisher.PublisherContext;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.dsl.Context;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 import org.jenkinsci.plugins.jiraext.view.JiraExtBuildStep;
+import org.jenkinsci.plugins.jiraext.view.JiraExtPublisherStep;
 
 /**
  * @author dalvizu
@@ -40,5 +42,13 @@ public class ContextExtensionPointImpl
 
         JiraExtBuildStep buildStep = new JiraExtBuildStep(context.issueStrategy, context.extensions);
         return buildStep;
+    }
+
+    @DslExtensionMethod(context = PublisherContext.class)
+    public Object updateJiraExtPublisher(Runnable closure) {
+        UpdateJiraExtContext context = new UpdateJiraExtContext();
+        executeInContext(closure, context);
+        JiraExtPublisherStep publisherStep = new JiraExtPublisherStep(context.issueStrategy, context.extensions);
+        return publisherStep;
     }
 }
