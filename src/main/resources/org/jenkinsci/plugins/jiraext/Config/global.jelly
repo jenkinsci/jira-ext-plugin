@@ -19,6 +19,14 @@
                  description="Comma-separate string of jira prefixes">
             <f:textbox default="FOO-,BAR-" />
         </f:entry>
+        <f:entry title="Include Status" field="includeStatuses"
+                 description="Comma-separate string of jira issue status's to filter on">
+            <f:textbox default="" />
+        </f:entry>
+        <f:entry title="Exclude Status" field="excludeStatuses"
+                 description="Comma-separate string of jira issue status's to filter out">
+            <f:textbox default="" />
+        </f:entry>
         <f:entry title="Verbose Logging" field="verboseLogging"
                  description="Whether to log a lot of information, ie API http debugging, in jobs">
             <f:checkbox />

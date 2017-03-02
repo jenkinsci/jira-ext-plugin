@@ -30,10 +30,12 @@ import net.rcarz.jiraclient.Version;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.Validate;
+import org.jenkinsci.plugins.jiraext.Config;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientFactory;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,15 @@ public final class JiraClientSvcImpl
     {
         logger.fine("Add comment to ticket: " + jiraIssueKey + " comment: " + comment);
         JiraClient client = newJiraClient();
-        client.getIssue(jiraIssueKey).addComment(comment);
+        Issue issue = client.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
+
+        //check if issue is the correct status
+        if (!issueStatusIsValid(issue)){
+            return;
+        }
+
+        issue.addComment(comment);
     }
 
     @Override
@@ -85,6 +95,13 @@ public final class JiraClientSvcImpl
 
         JiraClient client = newJiraClient();
         Issue issue = client.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
+
+        //check if issue is the correct status
+        if (!issueStatusIsValid(issue)){
+            return;
+        }
+
         for (String labelToAdd : labelsToAdd.split(" "))
         {
             if (issue.getLabels().contains(labelToAdd))
@@ -105,6 +122,13 @@ public final class JiraClientSvcImpl
         logger.fine("Transition ticket: " + jiraIssueKey + " transition name: " + transitionName);
         JiraClient jiraClient = newJiraClient();
         Issue issue = jiraClient.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
+
+        //check if issue is the correct status
+        if (!issueStatusIsValid(issue)){
+            return;
+        }
+
         issue.transition().execute(transitionName);
     }
 
@@ -118,6 +142,12 @@ public final class JiraClientSvcImpl
         JiraClient client = newJiraClient();
         Issue issue = client.getIssue(jiraIssueKey);
         Validate.notNull(issue);
+
+        //check if issue is the correct status
+        if (!issueStatusIsValid(issue)){
+            return;
+        }
+
         issue.update().field(jiraFieldName, content).execute();
     }
 
@@ -130,6 +160,12 @@ public final class JiraClientSvcImpl
         JiraClient client = newJiraClient();
         Issue issue = client.getIssue(jiraIssueKey);
         Validate.notNull(issue);
+
+        //check if issue is the correct status
+        if (!issueStatusIsValid(issue)){
+            return;
+        }
+
         RestClient restClient = client.getRestClient();
         try
         {
@@ -162,6 +198,12 @@ public final class JiraClientSvcImpl
         JiraClient client = newJiraClient();
         Issue issue = client.getIssue(jiraIssueKey);
         Validate.notNull(issue);
+
+        //check if issue is the correct status
+        if (!issueStatusIsValid(issue)){
+            return;
+        }
+
         List<Version> existingVersions = issue.getFixVersions();
         for (Version version : existingVersions)
         {
@@ -240,5 +282,43 @@ public final class JiraClientSvcImpl
             }
         }
         throw new JiraException("Unable to find version with name: " + name + ", only found versions named: " + foundVersionNames);
+    }
+
+
+    /**
+     * Checks that an issue has a valid status
+     *
+     * i.e. the issue is in the list of included statuses or not in the list of
+     * excluded statuses
+     *
+     * @param issue
+     * @return true if the issue should be updated, false if it should be skipped
+     */
+    private boolean issueStatusIsValid(Issue issue) {
+        Config.PluginDescriptor config = Config.getGlobalConfig();
+
+        List<String> includeStatuses = new ArrayList<>();
+        if (config.getIncludeStatuses().length() > 0) {
+            includeStatuses = Arrays.asList(config.getIncludeStatuses().split(","));
+        }
+
+        List<String> excludeStatuses = new ArrayList<>();
+        if (config.getExcludeStatuses().length() > 0) {
+            excludeStatuses = Arrays.asList(config.getExcludeStatuses().split(","));
+        }
+
+        //if 'Include status' is specified, don't update the issue if it's status is not in the
+        //list of included statuses.
+        if (!includeStatuses.isEmpty() && !includeStatuses.contains(issue.getStatus().getName())) {
+            return false;
+        }
+
+        //if 'Exclude status' is specified, don't update the issue if it's status is in the list
+        //of excluded statuses.
+        if (excludeStatuses.contains(issue.getStatus().getName())) {
+            return false;
+        }
+
+        return true;
     }
 }

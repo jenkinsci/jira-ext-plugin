@@ -63,6 +63,8 @@ public class Config
         private String username;
         private String password;
         private String pattern;
+        private String includeStatuses;
+        private String excludeStatuses;
         private boolean verboseLogging;
         private Integer timeout;
 
@@ -127,6 +129,24 @@ public class Config
             this.pattern = pattern;
         }
 
+        public String getIncludeStatuses() {
+            return includeStatuses;
+        }
+
+        public void setIncludeStatuses(String statusList)
+        {
+            this.includeStatuses = statusList;
+        }
+
+        public String getExcludeStatuses() {
+            return excludeStatuses;
+        }
+
+        public void setExcludeStatuses(String statusList)
+        {
+            this.excludeStatuses = statusList;
+        }
+
         public void setVerboseLogging(boolean verboseLogging)
         {
             this.verboseLogging = verboseLogging;
@@ -153,6 +173,8 @@ public class Config
             setUsername(formData.getString("username"));
             setPassword(formData.getString("password"));
             setPattern(formData.getString("pattern"));
+            setIncludeStatuses(formData.getString("includeStatuses"));
+            setExcludeStatuses(formData.getString("excludeStatuses"));
             setVerboseLogging(formData.getBoolean("verboseLogging"));
             setTimeout(formData.getInt("timeout"));
             save();
