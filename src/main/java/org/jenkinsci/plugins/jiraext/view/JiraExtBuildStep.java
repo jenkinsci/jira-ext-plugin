@@ -22,10 +22,8 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
-import hudson.model.Descriptor;
-import hudson.model.Saveable;
+import hudson.model.*;
+import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.DescribableList;
 import jenkins.model.Jenkins;
@@ -75,7 +73,7 @@ public class JiraExtBuildStep
 
     @Extension
     public static class DescriptorImpl
-        extends Descriptor<Builder>{
+        extends BuildStepDescriptor<Builder> {
 
         @Override
         public String getDisplayName()
@@ -91,6 +89,12 @@ public class JiraExtBuildStep
         public List<JiraOperationExtensionDescriptor> getExtensionDescriptors()
         {
             return JiraOperationExtensionDescriptor.all();
+        }
+
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+            // This builder can be used with all kinds of project types
+            return true;
         }
     }
 }
