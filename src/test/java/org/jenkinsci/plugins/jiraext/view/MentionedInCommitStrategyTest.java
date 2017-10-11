@@ -97,7 +97,7 @@ public class MentionedInCommitStrategyTest
     @Test
     public void testMultipleTicketNames()
     {
-        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("FOO-101 and BAR-101 are both in the message");
+        ChangeLogSet.Entry entry = MockChangeLogUtil.mockChangeLogSetEntry("FOO-101 and\n BAR-101 are both in the message");
         assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(2));
         assertThat(strategy.getJiraIssuesFromChangeSet(entry),
                 hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-101"))));
