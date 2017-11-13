@@ -103,12 +103,27 @@ public class MentionedInCommitStrategy
                 }
 
                 final String firstOccurrence = msg.substring(foundPos + validJiraPrefix.length());
-                final String regex = "^([0-9]*).*$";
+                final String regex = "\\A[0-9]*";
                 final Pattern pattern = Pattern.compile(regex);
                 final Matcher matcher = pattern.matcher(firstOccurrence);
-                matcher.matches();
 
-                final String ticketNumber = matcher.group(1);
+                if (!matcher.find())
+                {
+                    break;
+                }
+                /**
+                 * It is totally unclear why a regex for the entire
+                 * Jira ticket identifier is not a configuration item
+                 * It is strange to be seperating the ticket number from the
+                 * prefix, just to put it back together again -
+                 * without using either seperately.
+                 *
+                 * This would be a trivial change to the config, and
+                 * #probably# not break any existing code other than these isolated
+                 * areas where the prefix is being searched.
+                 */
+
+                final String ticketNumber = matcher.group();
 
                 if (StringUtils.isEmpty(ticketNumber))
                 {
