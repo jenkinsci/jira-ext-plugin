@@ -18,18 +18,18 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import com.google.inject.Inject;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
-import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Transition a JIRA issue
@@ -50,27 +50,48 @@ public class Transition
 
     @Override
     public void perform(List<JiraCommit> jiraCommitList,
-                        AbstractBuild build, Launcher launcher, BuildListener listener)
-    {
-        try
-        {
-            for (JiraCommit jiraCommit : JiraCommit.filterDuplicateIssues(jiraCommitList))
-            {
+                        AbstractBuild build, Launcher launcher, BuildListener listener) {
+        try {
+            for (JiraCommit jiraCommit : JiraCommit.filterDuplicateIssues(jiraCommitList)) {
                 listener.getLogger().println("Transition a ticket: " + jiraCommit.getJiraTicket());
-                listener.getLogger().println("transitionName: " + transitionName);
-                try
-                {
-                    getJiraClientSvc().changeWorkflowOfTicket(jiraCommit.getJiraTicket(), transitionName);
+
+                //Make a copy of all transitions since we will be removing the ones that are done
+                List<String> transitions = Arrays.stream(StringUtils.split(transitionName, ","))
+                        .map(t -> t.trim())
+                        .collect(Collectors.toList());
+                boolean didAnyTransition = false;
+
+                //Loop through all transitions until one works
+                while (transitions.size() > 0) {
+                    Iterator<String> transitionIter = transitions.iterator();
+                    boolean didTransition = false;
+                    while (transitionIter.hasNext()) {
+                        String transition = transitionIter.next();
+                        try {
+                            getJiraClientSvc().changeWorkflowOfTicket(jiraCommit.getJiraTicket(), transition);
+
+                            //Transition worked. Remove it from the list, and try the next one
+                            listener.getLogger().println("Performed transition: " + transition);
+                            transitionIter.remove();
+                            didAnyTransition = true;
+                            didTransition = true;
+                        } catch (Throwable t) {
+                            //Ignore and try next transition
+                        }
+                    }
+                    if (!didTransition) {
+                        //Did not perform any transitions this round. We are done!
+                        transitions.clear();
+                    }
                 }
-                catch (Throwable t)
-                {
-                    listener.getLogger().println("ERROR Updating JIRA, continuing");
-                    t.printStackTrace(listener.getLogger());
+
+                if (!didAnyTransition) {
+                    //No transitions were done. Show error message
+                    listener.getLogger().println("ERROR Updating JIRA with transitions [" + transitionName + "], continuing");
                 }
+
             }
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             listener.getLogger().println("ERROR Updating JIRA");
             t.printStackTrace(listener.getLogger());
         }
