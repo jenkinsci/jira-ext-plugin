@@ -40,7 +40,7 @@ public abstract class AbstractParsingIssueStrategy
     private static final Logger _logger = Logger.getLogger(FirstWordOfCommitStrategy.class.getName());
 
     @Override
-    public final List<JiraCommit> getJiraCommits(AbstractBuild build,
+    public List<JiraCommit> getJiraCommits(AbstractBuild build,
                                            BuildListener listener)
     {
         List<JiraCommit> result = new ArrayList<>();
