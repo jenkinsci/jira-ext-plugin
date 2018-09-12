@@ -69,10 +69,20 @@ public class FirstWordOfCommitStrategy
         String msg = change.getMsg();
         String firstWordOfTicket;
         firstWordOfTicket = msg.substring(0, (msg.contains(" ") ? StringUtils.indexOf(msg, " ") : msg.length()));
+        firstWordOfTicket = firstWordOfTicket.substring(0, (firstWordOfTicket.contains("]") ? StringUtils.indexOf(firstWordOfTicket, "]") : firstWordOfTicket.length()));
+        firstWordOfTicket = firstWordOfTicket.substring(0, (firstWordOfTicket.contains(":") ? StringUtils.indexOf(firstWordOfTicket, ":") : firstWordOfTicket.length()));
 
         for (String validJiraPrefix : Config.getGlobalConfig().getJiraTickets())
         {
             if (firstWordOfTicket.endsWith(":"))
+            {
+                firstWordOfTicket = firstWordOfTicket.substring(0, firstWordOfTicket.length() - 1);
+            }
+            if (firstWordOfTicket.startsWith("["))
+            {
+                firstWordOfTicket = firstWordOfTicket.substring(1);
+            }
+            if (firstWordOfTicket.endsWith("]"))
             {
                 firstWordOfTicket = firstWordOfTicket.substring(0, firstWordOfTicket.length() - 1);
             }

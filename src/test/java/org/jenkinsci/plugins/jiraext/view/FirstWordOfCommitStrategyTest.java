@@ -79,14 +79,22 @@ public class FirstWordOfCommitStrategyTest
         ChangeLogSet mockChangeSet = MockChangeLogUtil.mockChangeLogSet(
                 new MockChangeLogUtil.MockChangeLog("FOO-101 first", "dalvizu"),
                 new MockChangeLogUtil.MockChangeLog("BAR-102 again", "jsmith"),
+                new MockChangeLogUtil.MockChangeLog("BAR-103: third", "jsmith"),
+                new MockChangeLogUtil.MockChangeLog("[BAR-104] fourth", "jsmith"),
+                new MockChangeLogUtil.MockChangeLog("[BAR-105][section] fifth", "jsmith"),
+                new MockChangeLogUtil.MockChangeLog("[BAR-106]: sixth", "jsmith"),
                 new MockChangeLogUtil.MockChangeLog("No Valid Ticket", "build robot"));
         AbstractBuild mockBuild = mock(AbstractBuild.class);
         when(mockBuild.getChangeSet()).thenReturn(mockChangeSet);
         List<JiraCommit> commits = strategy.getJiraCommits(mockBuild,
                 new StreamBuildListener(System.out, Charset.defaultCharset()));
-        assertEquals(commits.size(), 2);
+        assertEquals(commits.size(), 6);
 
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-101"))));
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-102"))));
+        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-103"))));
+        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-104"))));
+        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-105"))));
+        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-106"))));
     }
 }
