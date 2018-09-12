@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Find JiraCommits by looking for the first word in the build's
@@ -69,27 +71,21 @@ public class FirstWordOfCommitStrategy
         String msg = change.getMsg();
         String firstWordOfTicket;
         firstWordOfTicket = msg.substring(0, (msg.contains(" ") ? StringUtils.indexOf(msg, " ") : msg.length()));
-        firstWordOfTicket = firstWordOfTicket.substring(0, (firstWordOfTicket.contains("]") ? StringUtils.indexOf(firstWordOfTicket, "]") : firstWordOfTicket.length()));
-        firstWordOfTicket = firstWordOfTicket.substring(0, (firstWordOfTicket.contains(":") ? StringUtils.indexOf(firstWordOfTicket, ":") : firstWordOfTicket.length()));
 
-        for (String validJiraPrefix : Config.getGlobalConfig().getJiraTickets())
+        final String regex = "([0-9A-Z]+-)([0-9]+)";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(firstWordOfTicket);
+
+        if (!matcher.find())
         {
-            if (firstWordOfTicket.endsWith(":"))
-            {
-                firstWordOfTicket = firstWordOfTicket.substring(0, firstWordOfTicket.length() - 1);
-            }
-            if (firstWordOfTicket.startsWith("["))
-            {
-                firstWordOfTicket = firstWordOfTicket.substring(1);
-            }
-            if (firstWordOfTicket.endsWith("]"))
-            {
-                firstWordOfTicket = firstWordOfTicket.substring(0, firstWordOfTicket.length() - 1);
-            }
-            if (firstWordOfTicket.startsWith(validJiraPrefix))
-            {
-                return Arrays.asList(new JiraCommit(firstWordOfTicket, change));
-            }
+            return null;
+        }
+
+        List<String> jiraPrefixes = Config.getGlobalConfig().getJiraTickets();
+
+        if (jiraPrefixes.contains(matcher.group(1)))
+        {
+            return Arrays.asList(new JiraCommit(matcher.group(0), change));
         }
 
         return null;
