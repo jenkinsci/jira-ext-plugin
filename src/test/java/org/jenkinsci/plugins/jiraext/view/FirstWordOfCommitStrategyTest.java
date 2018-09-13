@@ -52,7 +52,7 @@ public class FirstWordOfCommitStrategyTest
     @Before
     public void setUp()
     {
-        Config.getGlobalConfig().setPattern("FOO-,BAR-,MY_EXAMPLE_PROJECT-");
+        Config.getGlobalConfig().setPattern("FOO-,BAR-,MY_EXAMPLE_PROJECT-,2013PROJECT-");
     }
 
     @Test
@@ -89,7 +89,7 @@ public class FirstWordOfCommitStrategyTest
         when(mockBuild.getChangeSet()).thenReturn(mockChangeSet);
         List<JiraCommit> commits = strategy.getJiraCommits(mockBuild,
                 new StreamBuildListener(System.out, Charset.defaultCharset()));
-        assertEquals(commits.size(), 6);
+        assertEquals(commits.size(), 7);
 
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-101"))));
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-102"))));
@@ -98,5 +98,6 @@ public class FirstWordOfCommitStrategyTest
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-105"))));
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-106"))));
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("MY_EXAMPLE_PROJECT-107"))));
+        assertThat(commits, is(not(hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("2013PROJECT-107"))))));
     }
 }
