@@ -52,7 +52,7 @@ public class FirstWordOfCommitStrategyTest
     @Before
     public void setUp()
     {
-        Config.getGlobalConfig().setPattern("FOO-,BAR-");
+        Config.getGlobalConfig().setPattern("FOO-,BAR-,MY_EXAMPLE_PROJECT-");
     }
 
     @Test
@@ -83,6 +83,7 @@ public class FirstWordOfCommitStrategyTest
                 new MockChangeLogUtil.MockChangeLog("[BAR-104] fourth", "jsmith"),
                 new MockChangeLogUtil.MockChangeLog("[BAR-105][section] fifth", "jsmith"),
                 new MockChangeLogUtil.MockChangeLog("[BAR-106]: sixth", "jsmith"),
+                new MockChangeLogUtil.MockChangeLog("MY_EXAMPLE_PROJECT-107 seventh", "jsmith"),
                 new MockChangeLogUtil.MockChangeLog("No Valid Ticket", "build robot"));
         AbstractBuild mockBuild = mock(AbstractBuild.class);
         when(mockBuild.getChangeSet()).thenReturn(mockChangeSet);
@@ -96,5 +97,6 @@ public class FirstWordOfCommitStrategyTest
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-104"))));
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-105"))));
         assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("BAR-106"))));
+        assertThat(commits, hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("MY_EXAMPLE_PROJECT-107"))));
     }
 }
