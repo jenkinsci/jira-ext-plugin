@@ -72,7 +72,7 @@ public class FirstWordOfCommitStrategy
         String firstWordOfTicket;
         firstWordOfTicket = msg.substring(0, (msg.contains(" ") ? StringUtils.indexOf(msg, " ") : msg.length()));
 
-        final String regex = "([0-9A-Z]+-)([0-9]+)";
+        final String regex = "([A-Z][0-9A-Z_]+-)([0-9]+)";
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(firstWordOfTicket);
 
