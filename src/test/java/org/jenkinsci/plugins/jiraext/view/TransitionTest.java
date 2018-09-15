@@ -24,6 +24,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
+import net.rcarz.jiraclient.JiraException;
 import org.jenkinsci.plugins.jiraext.MockChangeLogUtil;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
@@ -31,6 +32,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -86,6 +89,29 @@ public class TransitionTest
 
         transition.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
         verify(jiraClientSvc, times(1)).changeWorkflowOfTicket(eq("SSD-101"), eq("Resolve"));
+    }
+
+    /**
+     * Test multiple transitions when some are invalid.
+     */
+    @Test
+    public void testMultipleTransition()
+            throws Exception
+    {
+        Transition transition = new Transition("Develop,Resolve,Closed");
+        transition.setJiraClientSvc(jiraClientSvc);
+        AbstractBuild mockBuild = mock(AbstractBuild.class);
+        when(mockBuild.getEnvironment(any(TaskListener.class))).thenReturn(new EnvVars());
+
+        doThrow(new JiraException("Invalid Transition")).when(jiraClientSvc).changeWorkflowOfTicket(eq("SSD-101"), eq("Develop"));
+
+        List<JiraCommit> jiraCommits = new ArrayList<>();
+        jiraCommits.add(new JiraCommit("SSD-101", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
+
+        transition.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
+        verify(jiraClientSvc, times(2)).changeWorkflowOfTicket(eq("SSD-101"), eq("Develop"));
+        verify(jiraClientSvc, times(1)).changeWorkflowOfTicket(eq("SSD-101"), eq("Resolve"));
+        verify(jiraClientSvc, times(1)).changeWorkflowOfTicket(eq("SSD-101"), eq("Closed"));
     }
 
     /**

@@ -25,6 +25,7 @@ import hudson.model.BuildListener;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.kohsuke.stapler.DataBoundConstructor;
+import java.util.logging.Logger;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 public class Transition
     extends JiraOperationExtension
 {
+    private Logger logger = Logger.getLogger(getClass().getSimpleName());
 
     public String transitionName;
 
@@ -50,7 +52,8 @@ public class Transition
 
     @Override
     public void perform(List<JiraCommit> jiraCommitList,
-                        AbstractBuild build, Launcher launcher, BuildListener listener) {
+                        AbstractBuild build, Launcher launcher, BuildListener listener)
+    {
         try {
             for (JiraCommit jiraCommit : JiraCommit.filterDuplicateIssues(jiraCommitList)) {
                 listener.getLogger().println("Transition a ticket: " + jiraCommit.getJiraTicket());
@@ -62,12 +65,15 @@ public class Transition
                 boolean didAnyTransition = false;
 
                 //Loop through all transitions until one works
-                while (transitions.size() > 0) {
+                while (transitions.size() > 0)
+                {
                     Iterator<String> transitionIter = transitions.iterator();
                     boolean didTransition = false;
-                    while (transitionIter.hasNext()) {
+                    while (transitionIter.hasNext())
+                    {
                         String transition = transitionIter.next();
-                        try {
+                        try
+                        {
                             getJiraClientSvc().changeWorkflowOfTicket(jiraCommit.getJiraTicket(), transition);
 
                             //Transition worked. Remove it from the list, and try the next one
@@ -75,23 +81,28 @@ public class Transition
                             transitionIter.remove();
                             didAnyTransition = true;
                             didTransition = true;
-                        } catch (Throwable t) {
+                        } catch (Throwable t)
+                        {
                             //Ignore and try next transition
+                            logger.fine("JIRA transition " + transition + " failed on ticket " + jiraCommit.getJiraTicket());
                         }
                     }
-                    if (!didTransition) {
+                    if (!didTransition)
+                    {
                         //Did not perform any transitions this round. We are done!
                         transitions.clear();
                     }
                 }
 
-                if (!didAnyTransition) {
+                if (!didAnyTransition)
+                {
                     //No transitions were done. Show error message
-                    listener.getLogger().println("ERROR Updating JIRA with transitions [" + transitionName + "], continuing");
+                    listener.getLogger().println("ERROR Updating JIRA with transitions [" + transitionName + "]. No transitions were valid. Continuing");
                 }
 
             }
-        } catch (Throwable t) {
+        } catch (Throwable t)
+        {
             listener.getLogger().println("ERROR Updating JIRA");
             t.printStackTrace(listener.getLogger());
         }
