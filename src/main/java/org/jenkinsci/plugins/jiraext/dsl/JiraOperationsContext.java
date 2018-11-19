@@ -24,6 +24,7 @@ import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import org.jenkinsci.plugins.jiraext.view.AddComment;
 import org.jenkinsci.plugins.jiraext.view.AddFixVersion;
 import org.jenkinsci.plugins.jiraext.view.AddLabel;
+import org.jenkinsci.plugins.jiraext.view.AddLabelToField;
 import org.jenkinsci.plugins.jiraext.view.JiraOperationExtension;
 import org.jenkinsci.plugins.jiraext.view.Transition;
 import org.jenkinsci.plugins.jiraext.view.UpdateField;
@@ -55,6 +56,10 @@ public class JiraOperationsContext
 
     public void updateField(String fieldName, String fieldValue) {
         extensions.add(new UpdateField(fieldName, fieldValue));
+    }
+
+    public void addLabelToField(String fieldName, String fieldValue) {
+        extensions.add(new AddLabelToField(fieldName, fieldValue));
     }
 
     public void addFixVersion(String fixVersion) {
