@@ -85,6 +85,16 @@ public interface JiraClientSvc
             throws JiraException;
 
     /**
+     * Adds a label to a ticket's field of the label type.
+     *
+     * @param jiraIssueKey
+     * @param jiraFieldName
+     * @param fieldContent
+     * @throws JiraException if issue cannot be accessed or field cannot be accessed or updated
+     */
+    void addLabelToField(String jiraIssueKey, String jiraFieldName, String fieldContent) throws JiraException;
+
+    /**
      * Add a Fix Version to a field, if it doesn't already exist.
      *
      * @param jiraIssueKey

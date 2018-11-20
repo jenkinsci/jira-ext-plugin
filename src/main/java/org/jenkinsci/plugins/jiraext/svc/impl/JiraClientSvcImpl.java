@@ -75,7 +75,9 @@ public final class JiraClientSvcImpl
     {
         logger.fine("Add comment to ticket: " + jiraIssueKey + " comment: " + comment);
         JiraClient client = newJiraClient();
-        client.getIssue(jiraIssueKey).addComment(comment);
+        Issue issue = client.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
+        issue.addComment(comment);
     }
 
     @Override
@@ -85,6 +87,7 @@ public final class JiraClientSvcImpl
 
         JiraClient client = newJiraClient();
         Issue issue = client.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
         for (String labelToAdd : labelsToAdd.split(" "))
         {
             if (issue.getLabels().contains(labelToAdd))
@@ -105,6 +108,7 @@ public final class JiraClientSvcImpl
         logger.fine("Transition ticket: " + jiraIssueKey + " transition name: " + transitionName);
         JiraClient jiraClient = newJiraClient();
         Issue issue = jiraClient.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
         issue.transition().execute(transitionName);
     }
 
@@ -151,6 +155,22 @@ public final class JiraClientSvcImpl
             String msg = "Error updating multi-select issue field";
             logger.log(Level.WARNING, msg, t);
             throw new JiraException(msg, t);
+        }
+    }
+
+    @Override
+    public void addLabelToField(String jiraIssueKey, String jiraFieldName, String fieldContent)
+            throws JiraException
+    {
+        logger.fine("Update ticket: " + jiraIssueKey + " field name: " + jiraFieldName + " add values " + fieldContent);
+
+        JiraClient client = newJiraClient();
+        Issue issue = client.getIssue(jiraIssueKey);
+        Validate.notNull(issue);
+
+        for (String labelToAdd : fieldContent.split(" ")) {
+            logger.fine("Adding label: " + labelToAdd);
+            issue.update().fieldAdd(jiraFieldName, labelToAdd).execute();
         }
     }
 
