@@ -144,4 +144,21 @@ public class MentionedInCommitStrategyTest
         assertThat(strategy.getJiraIssuesFromChangeSet(entry),
                 hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-141"))));
     }
+
+    @Test
+    public void testGetJiraTicketsFromChangeSet() {
+
+        String message = "First line of commit. Changed some things.";
+        StringBuilder stringBuilder = new StringBuilder();
+        String comment = stringBuilder.append(message)
+                .append("Changed some other stuff")
+                .append("\n")
+                .append("See ticket FOO-101")
+                .toString();
+         ChangeLogSet.Entry entry = MockChangeLogUtil.mockGitCommit(message, comment);
+         assertThat(strategy.getJiraIssuesFromChangeSet(entry).size(), equalTo(1));
+        assertThat(strategy.getJiraIssuesFromChangeSet(entry),
+                hasItem(Matchers.<JiraCommit>hasProperty("jiraTicket", equalTo("FOO-101"))));
+    }
+
 }
