@@ -19,6 +19,7 @@
 package org.jenkinsci.plugins.jiraext;
 
 import hudson.model.User;
+import hudson.plugins.git.GitChangeSet;
 import hudson.scm.ChangeLogSet;
 
 import java.util.ArrayList;
@@ -41,6 +42,26 @@ public class MockChangeLogUtil
             mockChangeLogs.add(new MockChangeLog(ticketMessage, "dalvizu"));
         }
         return mockChangeLogSet(mockChangeLogs.toArray(new MockChangeLog[mockChangeLogs.size()]));
+    }
+
+    /**
+     * Mock a GitChangeSet -- the GitChangeSet exposes a one line message in getMessage() and
+     * the full text in getComment()
+     *
+     * @param ticketMessage
+     * @param ticketComment
+     * @return
+     */
+    public static ChangeLogSet.Entry mockGitCommit(String ticketMessage, String ticketComment)
+    {
+        GitChangeSet gitChangeSet = mock(GitChangeSet.class);
+        when(gitChangeSet.getMsg()).thenReturn(ticketMessage);
+        when(gitChangeSet.getComment()).thenReturn(ticketComment);
+        User mockUser = mock(User.class);
+        when(mockUser.toString()).thenReturn("dalvizu");
+        when(gitChangeSet.getAuthor()).thenReturn(mockUser);
+        when(gitChangeSet.getCommitId()).thenReturn("mockCommitId");
+        return gitChangeSet;
     }
 
     public static ChangeLogSet.Entry mockChangeLogSetEntry(String ticketMessage)
