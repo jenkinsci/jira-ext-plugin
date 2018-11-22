@@ -23,6 +23,7 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 
+import hudson.plugins.git.GitChangeSet;
 import hudson.scm.ChangeLogSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -92,6 +93,10 @@ public class MentionedInCommitStrategy
         for (String validJiraPrefix : Config.getGlobalConfig().getJiraTickets())
         {
             String msg = change.getMsg();
+            if (change instanceof GitChangeSet)
+            {
+              msg = ((GitChangeSet) change).getComment();
+            }
 
             while (StringUtils.isNotEmpty(msg))
             {
