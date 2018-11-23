@@ -18,18 +18,13 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.scm.ChangeLogSet;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,11 +48,12 @@ public abstract class AbstractParsingIssueStrategy
         try
         {
             _logger.log(Level.FINE, "iterateTicketsAndApply");
-            List<Object> changeSetEntries = new LinkedList<>();
+            String projectName = build.getProject() == null ? "" : build.getProject().getName();
+            Integer buildNumber = build.getNumber();
+            listener.getLogger().println(String.format("ChangeLogSet from %s build %d, class: %s", projectName,
+                    buildNumber, build.getChangeSet().getClass()));
 
-            getBuildChangeSetEntries(listener, build, changeSetEntries);
-
-            for (Object entry : changeSetEntries)
+            for (Object entry : build.getChangeSets())
             {
                 try
                 {
@@ -85,14 +81,6 @@ public abstract class AbstractParsingIssueStrategy
             e.printStackTrace(listener.getLogger());
         }
         return result;
-    }
-
-    private void getBuildChangeSetEntries(BuildListener listener, AbstractBuild build, List<Object> changeSetEntries) {
-        ChangeLogSet changeSets = build.getChangeSet();
-        String projectName = build.getProject() == null ? "" : build.getProject().getName();
-        Integer buildNumber = build.getNumber();
-        listener.getLogger().println(String.format("ChangeLogSet from %s build %d, class: %s", projectName, buildNumber, changeSets.getClass()));
-        changeSetEntries.addAll(Lists.newArrayList(changeSets.iterator()));
     }
 
     /**

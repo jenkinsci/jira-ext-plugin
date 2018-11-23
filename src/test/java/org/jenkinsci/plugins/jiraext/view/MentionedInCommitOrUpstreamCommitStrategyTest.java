@@ -18,14 +18,27 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
+import hudson.model.AbstractBuild;
 import hudson.model.FreeStyleProject;
+import hudson.model.StreamBuildListener;
+import hudson.scm.ChangeLogSet;
+import hudson.triggers.SCMTrigger;
 import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.MockChangeLogUtil;
+import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author dalvizu
@@ -54,6 +67,24 @@ public class MentionedInCommitOrUpstreamCommitStrategyTest
 
         JiraExtBuildStep after = project.getBuildersList().get(JiraExtBuildStep.class);
         jenkinsRule.assertEqualBeans(builder, after, "issueStrategy");
+    }
+
+    @Test
+    public void testNoUpstream()
+    {
+        MentionedInCommitOrUpstreamCommitsStrategy strategy = new MentionedInCommitOrUpstreamCommitsStrategy();
+        List<ChangeLogSet.Entry> validChanges = Arrays.asList(
+                MockChangeLogUtil.mockChangeLogSetEntry("Hello World [FOO-101]"),
+                MockChangeLogUtil.mockChangeLogSetEntry("FOO-101 ticket at start"),
+                MockChangeLogUtil.mockChangeLogSetEntry("In the middle FOO-101 of the message"),
+                MockChangeLogUtil.mockChangeLogSetEntry("Weird characters FOO-101: next to it"));
+        AbstractBuild build = mock(AbstractBuild.class);
+        when(build.getChangeSet()).thenReturn(mock(ChangeLogSet.class));
+        when(build.getChangeSets()).thenReturn(validChanges);
+        when(build.getCauses())
+                .thenReturn(Arrays.asList(new SCMTrigger.SCMTriggerCause("Mock a cause")));
+        List<JiraCommit> result = strategy.getJiraCommits(build, new StreamBuildListener(System.out, Charset.defaultCharset()));
+        assertThat(result.size(), equalTo(4));
     }
 
 }

@@ -36,7 +36,8 @@ import java.util.stream.Collectors;
  * @author milowg
  */
 public class MentionedInCommitOrUpstreamCommitsStrategy
-        extends MentionedInCommitStrategy {
+        extends MentionedInCommitStrategy
+{
 
     @DataBoundConstructor
     public MentionedInCommitOrUpstreamCommitsStrategy()
@@ -51,15 +52,17 @@ public class MentionedInCommitOrUpstreamCommitsStrategy
     }
 
     @Override
-    public List<JiraCommit> getJiraCommits(AbstractBuild build, BuildListener buildListener) {
+    public List<JiraCommit> getJiraCommits(AbstractBuild build, BuildListener buildListener)
+    {
         List<JiraCommit> jiraCommits = super.getJiraCommits(build, buildListener);
 
-        for (AbstractBuild upstreamBuild : UpstreamBuildUtil.getUpstreamBuilds(build)) {
+        for (AbstractBuild upstreamBuild : UpstreamBuildUtil.getUpstreamBuilds(build))
+        {
             if (jiraCommits.addAll(
                     super.getJiraCommits(upstreamBuild, buildListener)
                             .stream()
                             .filter(jc -> !jiraCommits.contains(jc))
-                            .collect(Collectors.toSet()))) ;
+                            .collect(Collectors.toSet())));
         }
         return jiraCommits;
     }

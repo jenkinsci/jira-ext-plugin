@@ -22,7 +22,13 @@ import groovy.lang.Closure;
 import hudson.Extension;
 import javaposse.jobdsl.dsl.Context;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
-import org.jenkinsci.plugins.jiraext.view.*;
+import org.jenkinsci.plugins.jiraext.view.FirstWordOfCommitStrategy;
+import org.jenkinsci.plugins.jiraext.view.FirstWordOfUpstreamCommitStrategy;
+import org.jenkinsci.plugins.jiraext.view.IssueStrategyExtension;
+import org.jenkinsci.plugins.jiraext.view.MentionedInCommitOrUpstreamCommitsStrategy;
+import org.jenkinsci.plugins.jiraext.view.MentionedInCommitStrategy;
+import org.jenkinsci.plugins.jiraext.view.SingleTicketStrategy;
+
 
 /**
  * @author dalvizu
