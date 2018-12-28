@@ -19,7 +19,7 @@ job {
         }
         jiraOperations {
             transition('Deploy to Test');
-            addComment('You went through a Jenkins build!')
+            addComment('You went through a Jenkins build!', true)
             addLabel('Cool stuff')
             updateField('customField_123', 'Hello World')
         }
