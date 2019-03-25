@@ -18,11 +18,14 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext;
 
+import hudson.util.Secret;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+
+import static org.junit.Assert.*;
 
 /**
  * @author dalvizu
@@ -52,11 +55,26 @@ public class ConfigTest
         Config.PluginDescriptor before = Config.getGlobalConfig();
         before.setPattern("FOO-");
         before.setUsername("username");
-        before.setPassword("password");
+        before.setEncryptedPassword(Secret.fromString("password"));
         before.setVerboseLogging(true);
         jenkinsRule.configRoundtrip();
         Config.PluginDescriptor after = Config.getGlobalConfig();
-        jenkinsRule.assertEqualBeans(before, after, "jiraBaseUrl,username,password,pattern,verboseLogging");
+        jenkinsRule.assertEqualBeans(before, after, "jiraBaseUrl,username,encryptedPassword,pattern,verboseLogging");
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void testMigrationToEncryptedPassword()
+            throws Exception
+    {
+        Config.PluginDescriptor config = Config.getGlobalConfig();
+        config.setPattern("FOO-");
+        config.setUsername("username");
+        config.setPassword("password");
+        config.setVerboseLogging(true);
+        config.readResolve();
+        assertNull(config.getPassword());
+        assertEquals("password", config.getEncryptedPassword().getPlainText());
 
     }
 

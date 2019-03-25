@@ -5,22 +5,22 @@
     <f:section title="jira-ext Config">
 
         <f:entry title="JIRA Base URL" field="jiraBaseUrl"
-                 description="The base URL of Jira server, not ending with slash">
+                 description="The base URL of JIRA server, not ending with slash">
             <f:textbox />
         </f:entry>
         <f:entry title="JIRA Username" field="username"
-                 description="The Jira bot username">
+                 description="Username of a JIRA user, used in API requests as HTTP Basic Authentication">
             <f:textbox />
         </f:entry>
         <f:entry title="JIRA Password">
-          <f:password field="password" description="The Jira bot password"/>
+          <f:password field="password" description="Password of a JIRA user, used in API requests as HTTP Basic Authentication"/>
         </f:entry>
         <f:entry title="Ticket Pattern" field="pattern"
-                 description="Comma-separate string of jira prefixes">
+                 description="Comma-separate string of JIRA prefixes">
             <f:textbox default="FOO-,BAR-" />
         </f:entry>
         <f:entry title="Verbose Logging" field="verboseLogging"
-                 description="Whether to log a lot of information, ie API http debugging, in jobs">
+                 description="Whether to log a lot of information, ie API HTTP debugging, in jobs">
             <f:checkbox />
         </f:entry>
         <f:entry title="Timeout" field="timeout" description="Connection and socket timeout value, in seconds">

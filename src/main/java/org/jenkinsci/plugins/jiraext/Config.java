@@ -22,6 +22,7 @@ import hudson.Extension;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
+import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -61,7 +62,12 @@ public class Config
 
         private String jiraBaseUrl;
         private String username;
+
+        // SECURITY-836 this stores in plaintext on disk -- keep around so we can move this to
+        // correct encrypted field
         private String password;
+        private Secret encryptedPassword;
+
         private String pattern;
         private boolean verboseLogging;
         private Integer timeout;
@@ -77,6 +83,10 @@ public class Config
             if (timeout == null)
             {
                 timeout = 10;
+            }
+            if (StringUtils.isNotEmpty(password)) {
+                this.encryptedPassword = Secret.fromString(password);
+                this.password = null;
             }
             return this;
         }
@@ -107,16 +117,33 @@ public class Config
             this.username = username;
         }
 
+        @Deprecated
+        /**
+         * @deprecated do not use - this stores password in plaintext: SECURITY-836
+         */
         public String getPassword()
         {
             return password;
         }
 
+        @Deprecated
+        /**
+         * @deprecated do not use - this stores password in plaintext: SECURITY-836
+         */
         public void setPassword(String password)
         {
             this.password = password;
         }
 
+        public Secret getEncryptedPassword()
+        {
+            return encryptedPassword;
+        }
+
+        public void setEncryptedPassword(Secret encryptedPassword)
+        {
+            this.encryptedPassword = encryptedPassword;
+        }
         public String getPattern()
         {
             return pattern;

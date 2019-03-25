@@ -41,7 +41,7 @@ public class JiraClientFactoryImpl
         Config.PluginDescriptor config = Config.getGlobalConfig();
         String jiraUrl = config.getJiraBaseUrl();
         String username = config.getUsername();
-        String password = config.getPassword();
+        String password = config.getEncryptedPassword() == null ? null : config.getEncryptedPassword().getPlainText();
 
         BasicCredentials creds = new BasicCredentials(username, password);
         JiraClient client = new JiraClient(jiraUrl, creds);
