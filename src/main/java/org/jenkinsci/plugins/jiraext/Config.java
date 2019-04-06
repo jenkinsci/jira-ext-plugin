@@ -63,10 +63,7 @@ public class Config
         private String jiraBaseUrl;
         private String username;
 
-        // SECURITY-836 this stores in plaintext on disk -- keep around so we can move this to
-        // correct encrypted field
-        private String password;
-        private Secret encryptedPassword;
+        private Secret password;
 
         private String pattern;
         private boolean verboseLogging;
@@ -83,10 +80,6 @@ public class Config
             if (timeout == null)
             {
                 timeout = 10;
-            }
-            if (StringUtils.isNotEmpty(password)) {
-                this.encryptedPassword = Secret.fromString(password);
-                this.password = null;
             }
             return this;
         }
@@ -117,33 +110,16 @@ public class Config
             this.username = username;
         }
 
-        @Deprecated
-        /**
-         * @deprecated do not use - this stores password in plaintext: SECURITY-836
-         */
-        public String getPassword()
+        public Secret getPassword()
         {
             return password;
         }
 
-        @Deprecated
-        /**
-         * @deprecated do not use - this stores password in plaintext: SECURITY-836
-         */
-        public void setPassword(String password)
+        public void setPassword(Secret password)
         {
             this.password = password;
         }
 
-        public Secret getEncryptedPassword()
-        {
-            return encryptedPassword;
-        }
-
-        public void setEncryptedPassword(Secret encryptedPassword)
-        {
-            this.encryptedPassword = encryptedPassword;
-        }
         public String getPattern()
         {
             return pattern;
@@ -178,7 +154,7 @@ public class Config
         {
             setJiraBaseUrl(formData.getString("jiraBaseUrl"));
             setUsername(formData.getString("username"));
-            setPassword(formData.getString("password"));
+            setPassword(Secret.fromString(formData.getString("password")));
             setPattern(formData.getString("pattern"));
             setVerboseLogging(formData.getBoolean("verboseLogging"));
             setTimeout(formData.getInt("timeout"));
@@ -199,7 +175,7 @@ public class Config
         public boolean isJiraConfigComplete()
         {
             return StringUtils.isNotEmpty(jiraBaseUrl) && StringUtils.isNotEmpty(username)
-                    && StringUtils.isNotEmpty(password);
+                    && StringUtils.isNotEmpty(Secret.toString(password));
         }
     }
 

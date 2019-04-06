@@ -18,7 +18,7 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.svc.impl;
 
-
+import hudson.util.Secret;
 import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.JiraClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -41,7 +41,7 @@ public class JiraClientFactoryImpl
         Config.PluginDescriptor config = Config.getGlobalConfig();
         String jiraUrl = config.getJiraBaseUrl();
         String username = config.getUsername();
-        String password = config.getEncryptedPassword() == null ? null : config.getEncryptedPassword().getPlainText();
+        String password = Secret.toString(config.getPassword());
 
         BasicCredentials creds = new BasicCredentials(username, password);
         JiraClient client = new JiraClient(jiraUrl, creds);

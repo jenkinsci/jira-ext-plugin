@@ -18,6 +18,7 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.svc.impl;
 
+import hudson.util.Secret;
 import net.rcarz.jiraclient.JiraClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
@@ -41,7 +42,7 @@ public class JiraClientFactoryImplTest
     {
         Config.getGlobalConfig().setJiraBaseUrl("https://jira.localhost/local");
         Config.getGlobalConfig().setUsername("JenkinsBot");
-        Config.getGlobalConfig().setPassword("ChangeMe!");
+        Config.getGlobalConfig().setPassword(Secret.fromString("ChangeMe!"));
         Config.getGlobalConfig().setTimeout(20);
 
         JiraClientFactoryImpl factory = new JiraClientFactoryImpl();
