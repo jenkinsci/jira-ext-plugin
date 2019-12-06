@@ -5,7 +5,7 @@
     <f:section title="jira-ext Config">
 
         <f:entry title="JIRA Base URL" field="jiraBaseUrl"
-                 description="The base URL of JIRA server, not ending with slash">
+                 description="The base URL of JIRA server, ending with slash">
             <f:textbox />
         </f:entry>
         <f:entry title="JIRA Username" field="username"
