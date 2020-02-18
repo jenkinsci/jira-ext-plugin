@@ -29,7 +29,7 @@ import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.MockChangeLogUtil;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 
@@ -58,7 +58,7 @@ public class MentionedInCommitStrategyTest
     @Before
     public void setUp()
     {
-        Config.getGlobalConfig().setPattern("FOO-,BAR-");
+        JiraExtConfig.getGlobalConfig().setPattern("FOO-,BAR-");
         strategy = new MentionedInCommitStrategy();
     }
 

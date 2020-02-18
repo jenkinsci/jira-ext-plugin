@@ -38,18 +38,18 @@ import java.util.List;
  *
  * @author dalvizu
  */
-public class Config
+public class JiraExtConfig
     extends JobProperty<Job<?,?>>
 {
     @Override
     public PluginDescriptor getDescriptor()
     {
-        return Config.getGlobalConfig();
+        return JiraExtConfig.getGlobalConfig();
     }
 
     public static PluginDescriptor getGlobalConfig()
     {
-        return (PluginDescriptor)Jenkins.getInstance().getDescriptor(Config.class);
+        return (PluginDescriptor)Jenkins.getInstance().getDescriptor(JiraExtConfig.class);
     }
 
     @Extension
@@ -135,7 +135,7 @@ public class Config
             this.verboseLogging = verboseLogging;
         }
 
-        public boolean isVerboseLogging()
+        public boolean getVerboseLogging()
         {
             return verboseLogging;
         }

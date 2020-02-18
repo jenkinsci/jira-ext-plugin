@@ -23,7 +23,7 @@ import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.JiraClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientFactory;
 
 /**
@@ -38,7 +38,7 @@ public class JiraClientFactoryImpl
     @Override
     public JiraClient newJiraClient()
     {
-        Config.PluginDescriptor config = Config.getGlobalConfig();
+        JiraExtConfig.PluginDescriptor config = JiraExtConfig.getGlobalConfig();
         String jiraUrl = config.getJiraBaseUrl();
         String username = config.getUsername();
         String password = Secret.toString(config.getPassword());
