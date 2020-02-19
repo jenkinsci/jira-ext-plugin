@@ -71,9 +71,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
+      <groupId>org.jvnet.hudson</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.4.11.1</version>
+      <version>1.4.7-jenkins-1</version>
     </dependency>
     <!-- Support git as SCM provider by default -->
     <dependency>
