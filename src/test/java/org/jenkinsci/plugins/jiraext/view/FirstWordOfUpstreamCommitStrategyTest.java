@@ -19,7 +19,7 @@
 package org.jenkinsci.plugins.jiraext.view;
 
 import hudson.model.FreeStyleProject;
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class FirstWordOfUpstreamCommitStrategyTest
     @Before
     public void setUp()
     {
-        Config.getGlobalConfig().setPattern("FOO-,BAR-");
+        JiraExtConfig.getGlobalConfig().setPattern("FOO-,BAR-");
     }
 
     @Test

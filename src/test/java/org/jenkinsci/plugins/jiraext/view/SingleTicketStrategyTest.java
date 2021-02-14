@@ -23,7 +23,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.FreeStyleProject;
 import hudson.model.StreamBuildListener;
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +51,7 @@ public class SingleTicketStrategyTest
     @Before
     public void setUp()
     {
-        Config.getGlobalConfig().setPattern("FOO-,BAR-");
+        JiraExtConfig.getGlobalConfig().setPattern("FOO-,BAR-");
     }
 
     @Test

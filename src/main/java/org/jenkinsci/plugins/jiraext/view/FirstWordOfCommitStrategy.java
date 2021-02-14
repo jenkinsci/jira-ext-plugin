@@ -23,7 +23,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.scm.ChangeLogSet;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -81,7 +81,7 @@ public class FirstWordOfCommitStrategy
             return null;
         }
 
-        List<String> jiraPrefixes = Config.getGlobalConfig().getJiraTickets();
+        List<String> jiraPrefixes = JiraExtConfig.getGlobalConfig().getJiraTickets();
 
         if (jiraPrefixes.contains(matcher.group(1)))
         {

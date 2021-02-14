@@ -19,6 +19,7 @@
 package org.jenkinsci.plugins.jiraext;
 
 import hudson.Extension;
+import hudson.XmlFile;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
@@ -27,7 +28,9 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
+import com.thoughtworks.xstream.XStream;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,18 +41,18 @@ import java.util.List;
  *
  * @author dalvizu
  */
-public class Config
+public class JiraExtConfig
     extends JobProperty<Job<?,?>>
 {
     @Override
     public PluginDescriptor getDescriptor()
     {
-        return Config.getGlobalConfig();
+        return JiraExtConfig.getGlobalConfig();
     }
 
     public static PluginDescriptor getGlobalConfig()
     {
-        return (PluginDescriptor)Jenkins.getInstance().getDescriptor(Config.class);
+        return (PluginDescriptor)Jenkins.getInstance().getDescriptor(JiraExtConfig.class);
     }
 
     @Extension
@@ -135,7 +138,7 @@ public class Config
             this.verboseLogging = verboseLogging;
         }
 
-        public boolean isVerboseLogging()
+        public boolean getVerboseLogging()
         {
             return verboseLogging;
         }
@@ -160,6 +163,19 @@ public class Config
             setTimeout(formData.getInt("timeout"));
             save();
             return super.configure(req, formData);
+        }
+
+        /**
+         * For backwards compatibility
+         * This preserves the original file location
+         * Additionally allows the old config syntax to be read
+         */
+        @Override
+        protected XmlFile getConfigFile() {
+            XmlFile xml = new XmlFile(new File(Jenkins.getInstance().getRootDir(),"org.jenkinsci.plugins.jiraext.Config.xml"));
+            xml.getXStream().alias("org.jenkinsci.plugins.jiraext.Config", JiraExtConfig.class);
+            xml.getXStream().alias("org.jenkinsci.plugins.jiraext.Config$PluginDescriptor", PluginDescriptor.class);
+            return xml;
         }
 
         public void setTimeout(Integer timeoutInSeconds)

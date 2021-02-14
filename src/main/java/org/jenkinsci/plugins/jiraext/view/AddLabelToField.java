@@ -25,7 +25,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.util.FormValidation;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
@@ -120,7 +120,7 @@ public class AddLabelToField
         {
             try
             {
-                if (!Config.getGlobalConfig().isJiraConfigComplete())
+                if (!JiraExtConfig.getGlobalConfig().isJiraConfigComplete())
                 {
                     return FormValidation.error("JIRA settings are not set in global config");
                 }

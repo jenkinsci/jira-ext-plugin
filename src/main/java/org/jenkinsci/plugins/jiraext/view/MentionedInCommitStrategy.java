@@ -28,7 +28,7 @@ import hudson.scm.ChangeLogSet;
 
 import org.apache.commons.lang.StringUtils;
 
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -90,7 +90,7 @@ public class MentionedInCommitStrategy
         final List<JiraCommit> result = new ArrayList<>();
         final List<String> foundTickets = new ArrayList<>();
 
-        for (String validJiraPrefix : Config.getGlobalConfig().getJiraTickets())
+        for (String validJiraPrefix : JiraExtConfig.getGlobalConfig().getJiraTickets())
         {
             String msg = change.getMsg();
             if (change instanceof GitChangeSet)

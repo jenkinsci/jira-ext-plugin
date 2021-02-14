@@ -23,7 +23,7 @@ import hudson.model.FreeStyleProject;
 import hudson.model.StreamBuildListener;
 import hudson.scm.ChangeLogSet;
 import org.hamcrest.Matchers;
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.MockChangeLogUtil;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.junit.Before;
@@ -52,7 +52,7 @@ public class FirstWordOfCommitStrategyTest
     @Before
     public void setUp()
     {
-        Config.getGlobalConfig().setPattern("FOO-,BAR-,MY_EXAMPLE_PROJECT-,2013PROJECT-");
+        JiraExtConfig.getGlobalConfig().setPattern("FOO-,BAR-,MY_EXAMPLE_PROJECT-,2013PROJECT-");
     }
 
     @Test

@@ -52,13 +52,13 @@ public class ConfigTest
     public void testSaveConfig()
         throws Exception
     {
-        Config.PluginDescriptor before = Config.getGlobalConfig();
+        JiraExtConfig.PluginDescriptor before = JiraExtConfig.getGlobalConfig();
         before.setPattern("FOO-");
         before.setUsername("username");
         before.setPassword(Secret.fromString("password"));
         before.setVerboseLogging(true);
         jenkinsRule.configRoundtrip();
-        Config.PluginDescriptor after = Config.getGlobalConfig();
+        JiraExtConfig.PluginDescriptor after = JiraExtConfig.getGlobalConfig();
         jenkinsRule.assertEqualBeans(before, after, "jiraBaseUrl,username,password,pattern,verboseLogging");
     }
 

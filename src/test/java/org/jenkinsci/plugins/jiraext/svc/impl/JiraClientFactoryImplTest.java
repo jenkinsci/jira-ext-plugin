@@ -22,7 +22,7 @@ import hudson.util.Secret;
 import net.rcarz.jiraclient.JiraClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
-import org.jenkinsci.plugins.jiraext.Config;
+import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -40,10 +40,10 @@ public class JiraClientFactoryImplTest
     @Test
     public void setup()
     {
-        Config.getGlobalConfig().setJiraBaseUrl("https://jira.localhost/local");
-        Config.getGlobalConfig().setUsername("JenkinsBot");
-        Config.getGlobalConfig().setPassword(Secret.fromString("ChangeMe!"));
-        Config.getGlobalConfig().setTimeout(20);
+        JiraExtConfig.getGlobalConfig().setJiraBaseUrl("https://jira.localhost/local");
+        JiraExtConfig.getGlobalConfig().setUsername("JenkinsBot");
+        JiraExtConfig.getGlobalConfig().setPassword(Secret.fromString("ChangeMe!"));
+        JiraExtConfig.getGlobalConfig().setTimeout(20);
 
         JiraClientFactoryImpl factory = new JiraClientFactoryImpl();
         JiraClient jiraClient = factory.newJiraClient();
