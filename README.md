@@ -1,5 +1,6 @@
-#jira-ext-plugin
-[![Build Status](https://jenkins.ci.cloudbees.com/buildStatus/icon?job=plugins/jira-ext-plugin)](https://jenkins.ci.cloudbees.com/job/plugins/job/jira-ext-plugin/)
+# `jira-ext-plugin`
+
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/jira-ext-plugin/job/master/lastBuild/badge/icon)](https://ci.jenkins.io/job/Plugins/job/jira-ext-plugin/job/master/lastBuild/)
 
 * [Wiki][wiki]
 * [Issue Tracking][issues]
@@ -69,7 +70,7 @@ You may add your own operations using a `JiraOperationExtension` and `JiraOperat
 # Authors
 Dan Alvizu <alvizu@gmail.com>
 
-#License
+# License
 Licensed under the Apache License, Version 2.0 (the “License”); you may not use this file except in compliance with the
 License. You may obtain a copy of the License at
 
