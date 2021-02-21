@@ -24,6 +24,9 @@ import hudson.model.Cause;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,6 +74,43 @@ public class UpstreamBuildUtil
             return build;
         }
         return getUpstreamBuild(upstreamBuild);
+    }
+
+    /**
+     * Gets all upstream builds which caused this build.
+     *
+     * @return
+     */
+    public static List<AbstractBuild<?, ?>> getUpstreamBuilds(AbstractBuild<?, ?> build)
+    {
+        logger.log(Level.FINE, "Find build upstream of " + build.getId());
+
+        Cause.UpstreamCause cause = getUpstreamCause(build);
+        if (cause == null)
+        {
+            logger.log(Level.FINE, "No upstream cause, so must be root upstream build: " + build.getId());
+            return Collections.<AbstractBuild<?, ?>>emptyList();
+        }
+        logger.log(Level.FINE, "Found upstream cause: " + cause.toString() + "(" + cause.getShortDescription() + ")");
+        AbstractProject project = (AbstractProject) Jenkins.getInstance().getItem(cause.getUpstreamProject(), build.getProject());
+        if (project == null)
+        {
+            logger.log(Level.WARNING, "Found an UpstreamCause (" + cause.toString()
+                    + "), but the upstream project (" + cause.getUpstreamProject() + ") does not appear to be valid!");
+            return Collections.<AbstractBuild<?, ?>>emptyList();
+        }
+        AbstractBuild upstreamBuild = project.getBuildByNumber(cause.getUpstreamBuild());
+        if (upstreamBuild == null)
+        {
+            logger.log(Level.WARNING, "Found an UpstreamCause (" + cause.toString()
+                    + "), and an upstream project (" + project.getName() + "), but the build is invalid!" + cause.getUpstreamBuild());
+            return Collections.<AbstractBuild<?, ?>>emptyList();
+        }
+        List<AbstractBuild<?, ?>> upstreamBuilds = new LinkedList<>();
+        upstreamBuilds.add(upstreamBuild);
+        upstreamBuilds.addAll(getUpstreamBuilds(upstreamBuild));
+
+        return upstreamBuilds;
     }
 
     private static Cause.UpstreamCause getUpstreamCause(Run run)

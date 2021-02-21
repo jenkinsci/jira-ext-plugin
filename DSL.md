@@ -16,6 +16,8 @@ job {
             firstWordOfUpstreamCommit()
             // - or -
             mentionedInCommit()
+            // - or -
+            mentionedInCommitOrUpstreamCommits()            
         }
         jiraOperations {
             transition('Deploy to Test');

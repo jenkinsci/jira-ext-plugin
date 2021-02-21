@@ -18,19 +18,24 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.scm.ChangeLogSet;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * An IssueStrategyExtension which assumes you want to return a list of jira commits by
- * deriving them from the provided build's {@link ChangeLogSet}
+ * deriving them from the provided build's {@link ChangeLogSet}. Also includes upstream build ChangeLogSets
  *
  * @author dalvizu
  */
@@ -40,7 +45,7 @@ public abstract class AbstractParsingIssueStrategy
     private static final Logger _logger = Logger.getLogger(FirstWordOfCommitStrategy.class.getName());
 
     @Override
-    public final List<JiraCommit> getJiraCommits(AbstractBuild build,
+    public List<JiraCommit> getJiraCommits(AbstractBuild build,
                                            BuildListener listener)
     {
         List<JiraCommit> result = new ArrayList<>();
@@ -48,10 +53,11 @@ public abstract class AbstractParsingIssueStrategy
         try
         {
             _logger.log(Level.FINE, "iterateTicketsAndApply");
-            ChangeLogSet changeSets = build.getChangeSet();
-            listener.getLogger().println("ChangeLogSet class: " + changeSets.getClass());
+            List<Object> changeSetEntries = new LinkedList<>();
 
-            for (Object entry : changeSets)
+            getBuildChangeSetEntries(listener, build, changeSetEntries);
+
+            for (Object entry : changeSetEntries)
             {
                 try
                 {
@@ -79,6 +85,14 @@ public abstract class AbstractParsingIssueStrategy
             e.printStackTrace(listener.getLogger());
         }
         return result;
+    }
+
+    private void getBuildChangeSetEntries(BuildListener listener, AbstractBuild build, List<Object> changeSetEntries) {
+        ChangeLogSet changeSets = build.getChangeSet();
+        String projectName = build.getProject() == null ? "" : build.getProject().getName();
+        Integer buildNumber = build.getNumber();
+        listener.getLogger().println(String.format("ChangeLogSet from %s build %d, class: %s", projectName, buildNumber, changeSets.getClass()));
+        changeSetEntries.addAll(Lists.newArrayList(changeSets.iterator()));
     }
 
     /**
