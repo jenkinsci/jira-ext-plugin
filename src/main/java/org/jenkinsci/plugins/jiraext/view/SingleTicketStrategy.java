@@ -86,6 +86,12 @@ public class SingleTicketStrategy
     }
 
     @Override
+    public int hashCode()
+    {
+        return SingleTicketStrategy.class.hashCode();
+    }
+
+    @Override
     public String toString()
     {
         return "SingleTicketStrategy[issueKey=" + issueKey + "]";

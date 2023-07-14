@@ -27,11 +27,6 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.Arrays;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
 /**
  * @author dalvizu
  */

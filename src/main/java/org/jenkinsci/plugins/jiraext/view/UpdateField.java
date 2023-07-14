@@ -18,13 +18,11 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import com.google.inject.Inject;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.util.FormValidation;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
@@ -35,6 +33,7 @@ import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.QueryParameter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,13 +79,23 @@ public class UpdateField
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null || !(obj instanceof UpdateField))
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
         {
             return false;
         }
         UpdateField other = (UpdateField)obj;
-        return StringUtils.equals(fieldValue, other.fieldValue)
-                && StringUtils.equals(fieldName, other.fieldName);
+        return Objects.equals(fieldValue, other.fieldValue)
+                && Objects.equals(fieldName, other.fieldName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(fieldValue, fieldName);
     }
 
     @Override

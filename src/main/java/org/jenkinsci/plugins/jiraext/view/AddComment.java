@@ -19,7 +19,6 @@
 package org.jenkinsci.plugins.jiraext.view;
 
 import com.google.common.base.Optional;
-import com.google.inject.Inject;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
@@ -28,7 +27,6 @@ import hudson.model.BuildListener;
 import hudson.plugins.git.GitChangeSet;
 import hudson.scm.ChangeLogSet;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -36,6 +34,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Add a comment to a JIRA issue
@@ -133,13 +132,23 @@ public class AddComment
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null || !(obj instanceof AddComment))
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
         {
             return false;
         }
         AddComment other = (AddComment)obj;
-        return (postCommentForEveryCommit == other.postCommentForEveryCommit)
-            && StringUtils.equals(commentText, other.commentText);
+        return postCommentForEveryCommit == other.postCommentForEveryCommit
+                && Objects.equals(commentText, other.commentText);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(postCommentForEveryCommit, commentText);
     }
 
     @Override
