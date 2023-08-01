@@ -18,18 +18,16 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import com.google.inject.Inject;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Add a label to a JIRA issue
@@ -72,12 +70,22 @@ public class AddLabel
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null || !(obj instanceof AddLabel))
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
         {
             return false;
         }
         AddLabel other = (AddLabel)obj;
-        return StringUtils.equals(labelName, other.labelName);
+        return Objects.equals(labelName, other.labelName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(labelName);
     }
 
     @Override

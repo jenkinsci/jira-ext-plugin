@@ -18,18 +18,16 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import com.google.inject.Inject;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Transition a JIRA issue
@@ -79,12 +77,22 @@ public class Transition
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null || !(obj instanceof Transition))
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
         {
             return false;
         }
         Transition other = (Transition)obj;
-        return StringUtils.equals(transitionName, other.transitionName);
+        return Objects.equals(transitionName, other.transitionName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(transitionName);
     }
 
     @Override

@@ -108,4 +108,10 @@ public class FirstWordOfCommitStrategy
     {
         return obj != null && obj instanceof FirstWordOfCommitStrategy;
     }
+
+    @Override
+    public int hashCode()
+    {
+        return FirstWordOfCommitStrategy.class.hashCode();
+    }
 }

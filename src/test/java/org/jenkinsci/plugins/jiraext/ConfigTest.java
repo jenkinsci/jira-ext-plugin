@@ -25,8 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import static org.junit.Assert.*;
-
 /**
  * @author dalvizu
  */

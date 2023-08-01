@@ -73,6 +73,11 @@ public class MentionedInCommitStrategy
         return (obj != null) && (obj instanceof MentionedInCommitStrategy);
     }
 
+    @Override
+    public int hashCode()
+    {
+        return MentionedInCommitStrategy.class.hashCode();
+    }
 
 
     /**
