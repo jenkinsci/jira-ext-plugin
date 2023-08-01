@@ -34,7 +34,7 @@
 
                     var parameters = {};
 
-                    paramList.split(',').each(function(name) {
+                    paramList.split(',').forEach(function(name) {
                         var p = findPreviousFormItem(button,name);
                         if(p!=null) {
                             if(p.type=="checkbox")  parameters[name] = p.checked;
@@ -42,28 +42,33 @@
                         }
                     });
 
-                    var spinner = $(button).up("DIV").next();
-                    var target = spinner.next();
+                    var spinner = button.closest("DIV").nextElementSibling;
+                    var target = spinner.nextElementSibling;
                     spinner.style.display="block";
 
-                    new Ajax.Request(checkUrl, {
-                        parameters: parameters,
-                        onComplete: function(rsp) {
+                    fetch(checkUrl, {
+                        method: "POST",
+                        headers: crumb.wrap({
+                          "Content-Type": "application/x-www-form-urlencoded",
+                        }),
+                        body: new URLSearchParams(parameters),
+                    }).then((rsp) => {
+                        rsp.text().then((responseText) => {
                             spinner.style.display="none";
                             var i;
-                            target.innerHTML = rsp.status==200 ? rsp.responseText
+                            target.innerHTML = rsp.status==200 ? responseText
                             : '<a href="" onclick="document.getElementById(\'valerr' + (i=iota++)
                                     + '\').style.display=\'block\';return false">ERROR</a><div id="valerr'
-                                    + i + '" style="display:none">' + rsp.responseText + '</div>';
+                                    + i + '" style="display:none">' + responseText + '</div>';
                             Behaviour.applySubtree(target);
                             layoutUpdateCallback.call();
-                            var s = rsp.getResponseHeader("script");
+                            var s = rsp.headers.get("script");
                             try {
                                 geval(s);
                             } catch(e) {
                                 window.alert("failed to evaluate "+s+"\n"+e.message);
                             }
-                        }
+                        });
                     });
                 }
                 ]]></script>
