@@ -72,4 +72,10 @@ public class FirstWordOfUpstreamCommitStrategy
     {
         return obj != null && obj instanceof FirstWordOfUpstreamCommitStrategy;
     }
+
+    @Override
+    public int hashCode()
+    {
+        return FirstWordOfUpstreamCommitStrategy.class.hashCode();
+    }
 }

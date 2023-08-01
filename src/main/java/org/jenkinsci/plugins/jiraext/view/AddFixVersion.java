@@ -22,13 +22,12 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.jiraext.GuiceSingleton;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Add a 'Fix Version' to a JIRA issue. The Fix Version must exist.
@@ -68,11 +67,22 @@ public class AddFixVersion
     @Override
     public boolean equals(Object obj)
     {
-        if (obj instanceof AddFixVersion){
-            AddFixVersion other = (AddFixVersion)obj;
-            return StringUtils.equals(other.fixVersion, this.fixVersion);
+        if (this == obj)
+        {
+            return true;
         }
-        return false;
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        AddFixVersion other = (AddFixVersion)obj;
+        return Objects.equals(fixVersion, other.fixVersion);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(fixVersion);
     }
 
     @Extension(optional=true)

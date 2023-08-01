@@ -28,7 +28,6 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
-import com.thoughtworks.xstream.XStream;
 
 import java.io.File;
 import java.io.Serializable;

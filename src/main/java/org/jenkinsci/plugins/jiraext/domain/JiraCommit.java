@@ -20,11 +20,10 @@ package org.jenkinsci.plugins.jiraext.domain;
 
 import com.google.common.base.Optional;
 import hudson.scm.ChangeLogSet;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author dalvizu
@@ -92,12 +91,22 @@ public class JiraCommit
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null || !(obj instanceof JiraCommit))
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
         {
             return false;
         }
         JiraCommit other = (JiraCommit)obj;
-        return (StringUtils.equals(jiraTicket, other.jiraTicket)
-                && ObjectUtils.equals(changeSet, other.changeSet));
+        return Objects.equals(jiraTicket, other.jiraTicket)
+                && Objects.equals(changeSet, other.changeSet);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(jiraTicket, changeSet);
     }
 }

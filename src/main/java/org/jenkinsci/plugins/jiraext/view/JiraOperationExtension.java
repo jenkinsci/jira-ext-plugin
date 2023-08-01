@@ -18,7 +18,6 @@
  **************************************************************************/
 package org.jenkinsci.plugins.jiraext.view;
 
-import com.google.inject.Inject;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractDescribableImpl;
