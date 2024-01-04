@@ -78,7 +78,7 @@
                    onclick="populateJiraFields('${descriptor.descriptorFullUrl}/queryJiraFields', 'issueKey',this)" />
         </div>
         <div style="display:none;">
-            <img src="${imagesURL}/spinner.gif" /> ${attrs.progress}
+            <l:progressAnimation/> ${attrs.progress}
         </div>
         <div><!-- this is where the error message goes --></div>
         </f:entry>
