@@ -1,4 +1,6 @@
-# Changelog
+# Old Changelog
+
+# Future entries are located in [GitHub releases](https://github.com/jenkinsci/jira-ext-plugin/releases/).
 
 ## 0.8 March 23 2019
 

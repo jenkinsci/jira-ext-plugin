@@ -2,7 +2,6 @@
 
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/jira-ext-plugin/job/master/lastBuild/badge/icon)](https://ci.jenkins.io/job/Plugins/job/jira-ext-plugin/job/master/lastBuild/)
 
-* [Wiki][wiki]
 * [Issue Tracking][issues]
 
 A plugin for Jenkins CI to update JIRA tickets in an extensible way: both what to update and how to update are exposed as `ExtensionPoint`s.
@@ -67,6 +66,37 @@ See `SingleTicketStrategy` for an example.
 ## Add a custom JIRA operation
 You may add your own operations using a `JiraOperationExtension` and `JiraOperationExtensionDescriptor`. See `AddComment` for an example.
 
+## The jira-ext plugin can be configured via job-dsl plugin:
+
+```groovy
+job {
+  //...
+  steps {
+    //...
+    updateJiraExt {
+        issueStrategy {
+            singleIssue('JENKINS-101')
+            // - or -
+            firstWordOfCommit()
+            // - or -
+            firstWordOfUpstreamCommit()
+            // - or -
+            mentionedInCommit()
+        }
+     
+        jiraOperations {
+            transition('Deploy to Test');
+            addComment('You went through a Jenkins build!', true)
+            addLabel('Cool stuff')
+            updateField('customField_123', 'Hello World')
+        }
+    }
+    //...
+  }
+}
+
+```
+
 # Authors
 Dan Alvizu <alvizu@gmail.com>
 
@@ -80,5 +110,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  language governing permissions and limitations under the License.
  
-[issues]: https://issues.jenkins-ci.org/issues/?jql=project%20%3D%20JENKINS%20AND%20status%20in%20(Open%2C%20%22In%20Progress%22%2C%20Reopened)%20AND%20component%20%3D%20%27jira-ext-plugin%27
-[wiki]: https://wiki.jenkins-ci.org/display/JENKINS/Jira-Ext+Plugin
+[issues]: https://issues.jenkins.io/browse/JENKINS-71940?jql=project%20%3D%20JENKINS%20AND%20status%20in%20(Open%2C%20%22In%20Progress%22%2C%20Reopened)%20AND%20component%20%3D%20%27jira-ext-plugin%27
