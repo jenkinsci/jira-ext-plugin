@@ -31,7 +31,7 @@ public abstract class JiraOperationExtensionDescriptor
         extends Descriptor<JiraOperationExtension>
 {
     public static DescriptorExtensionList<JiraOperationExtension,JiraOperationExtensionDescriptor> all() {
-        return Jenkins.getInstance().getDescriptorList(JiraOperationExtension.class);
+        return Jenkins.get().getDescriptorList(JiraOperationExtension.class);
     }
 
 }

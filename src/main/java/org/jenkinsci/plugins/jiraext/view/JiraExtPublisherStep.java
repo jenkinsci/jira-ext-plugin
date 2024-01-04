@@ -95,7 +95,7 @@ public class JiraExtPublisherStep
 
         public DescriptorExtensionList<IssueStrategyExtension, Descriptor<IssueStrategyExtension>> getIssueStrategies()
         {
-            return Jenkins.getInstance().getDescriptorList(IssueStrategyExtension.class);
+            return Jenkins.get().getDescriptorList(IssueStrategyExtension.class);
         }
 
         public List<JiraOperationExtensionDescriptor> getExtensionDescriptors()

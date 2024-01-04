@@ -51,7 +51,7 @@ public class JiraExtConfig
 
     public static PluginDescriptor getGlobalConfig()
     {
-        return (PluginDescriptor)Jenkins.getInstance().getDescriptor(JiraExtConfig.class);
+        return (PluginDescriptor)Jenkins.get().getDescriptor(JiraExtConfig.class);
     }
 
     @Extension
@@ -171,7 +171,7 @@ public class JiraExtConfig
          */
         @Override
         protected XmlFile getConfigFile() {
-            XmlFile xml = new XmlFile(new File(Jenkins.getInstance().getRootDir(),"org.jenkinsci.plugins.jiraext.Config.xml"));
+            XmlFile xml = new XmlFile(new File(Jenkins.get().getRootDir(),"org.jenkinsci.plugins.jiraext.Config.xml"));
             xml.getXStream().alias("org.jenkinsci.plugins.jiraext.Config", JiraExtConfig.class);
             xml.getXStream().alias("org.jenkinsci.plugins.jiraext.Config$PluginDescriptor", PluginDescriptor.class);
             return xml;

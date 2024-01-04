@@ -53,7 +53,7 @@ public class UpstreamBuildUtil
             return build;
         }
         logger.log(Level.FINE, "Found upstream cause: " + cause.toString() + "(" + cause.getShortDescription() + ")");
-        AbstractProject project = (AbstractProject) Jenkins.getInstance().getItem(cause.getUpstreamProject(), build.getProject());
+        AbstractProject project = (AbstractProject) Jenkins.get().getItem(cause.getUpstreamProject(), build.getProject());
         if (project == null)
         {
             logger.log(Level.WARNING, "Found an UpstreamCause (" + cause.toString()

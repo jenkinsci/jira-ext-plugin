@@ -29,7 +29,7 @@ public abstract class IssueStrategyExtensionDescriptor
     extends Descriptor<IssueStrategyExtension>
 {
     public static DescriptorExtensionList<IssueStrategyExtension,IssueStrategyExtensionDescriptor> all() {
-        return Jenkins.getInstance().getDescriptorList(IssueStrategyExtension.class);
+        return Jenkins.get().getDescriptorList(IssueStrategyExtension.class);
     }
 
 }
