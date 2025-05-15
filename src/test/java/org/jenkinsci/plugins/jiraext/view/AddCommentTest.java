@@ -118,6 +118,7 @@ public class AddCommentTest
         jiraCommits.add(new JiraCommit("SSD-102", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
         doThrow(new RuntimeException("Issue is invalid"))
                 .when(jiraClientSvc).addCommentToTicket("SSD-101", "Test Comment");
+        doNothing().when(jiraClientSvc).addCommentToTicket("SSD-102", "Test Comment");
         addComment.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
         verify(jiraClientSvc, times(1)).addCommentToTicket("SSD-101", "Test Comment");
         verify(jiraClientSvc, times(1)).addCommentToTicket("SSD-102", "Test Comment");
