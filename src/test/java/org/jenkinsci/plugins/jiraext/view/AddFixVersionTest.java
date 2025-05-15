@@ -121,6 +121,7 @@ public class AddFixVersionTest
 
         doThrow(new RuntimeException("Issue is invalid"))
                 .when(jiraClientSvc).addFixVersion("SSD-101", "Beta Release");
+        doNothing().when(jiraClientSvc).addFixVersion("SSD-102", "Beta Release");
         addFixVersion.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
         // no exception - good!
 
