@@ -119,6 +119,7 @@ public class UpdateFieldTest
         jiraCommits.add(new JiraCommit("SSD-102", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
         doThrow(new RuntimeException("Issue is invalid"))
                 .when(jiraClientSvc).updateStringField(eq("SSD-101"), eq("CustomField_123"), eq("Completed"));
+        doNothing().when(jiraClientSvc).updateStringField("SSD-102","CustomField_123", "Completed");
         updateField.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
         verify(jiraClientSvc, times(1)).updateStringField(eq("SSD-101"), eq("CustomField_123"), eq("Completed"));
         verify(jiraClientSvc, times(1)).updateStringField(eq("SSD-102"), eq("CustomField_123"), eq("Completed"));
