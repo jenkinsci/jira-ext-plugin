@@ -116,6 +116,7 @@ public class AddLabelToFieldTest {
         jiraCommits.add(new JiraCommit("SSD-102", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
         doThrow(new RuntimeException("Issue is invalid"))
                 .when(jiraClientSvc).addLabelToField(eq("SSD-101"), eq("CustomField_123"), eq("Completed"));
+        doNothing().when(jiraClientSvc).addLabelToField("SSD-102", "CustomField_123", "Completed");
         addLabelToField.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
         verify(jiraClientSvc, times(1)).addLabelToField(eq("SSD-101"), eq("CustomField_123"), eq("Completed"));
         verify(jiraClientSvc, times(1)).addLabelToField(eq("SSD-102"), eq("CustomField_123"), eq("Completed"));
