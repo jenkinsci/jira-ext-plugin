@@ -121,6 +121,7 @@ public class AddLabelTest
         jiraCommits.add(new JiraCommit("SSD-102", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
         doThrow(new RuntimeException("Issue is invalid"))
                 .when(jiraClientSvc).addLabelToTicket("SSD-101", "Test Label");
+        doNothing().when(jiraClientSvc).addLabelToTicket("SSD-102", "Test Label");
         addLabel.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
         verify(jiraClientSvc, times(1)).addLabelToTicket(eq("SSD-101"), eq("Test Label"));
         verify(jiraClientSvc, times(1)).addLabelToTicket(eq("SSD-102"), eq("Test Label"));
