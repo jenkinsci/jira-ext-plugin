@@ -101,7 +101,8 @@ public class TransitionTest
         jiraCommits.add(new JiraCommit("SSD-101", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
         jiraCommits.add(new JiraCommit("SSD-102", MockChangeLogUtil.mockChangeLogSetEntry("Test Comment")));
         doThrow(new RuntimeException("Issue is invalid"))
-                .when(jiraClientSvc).changeWorkflowOfTicket("SSD-101", "Test Comment");
+                .when(jiraClientSvc).changeWorkflowOfTicket("SSD-101", "Resolve");
+        doNothing().when(jiraClientSvc).changeWorkflowOfTicket("SSD-102", "Resolve");
         transition.perform(jiraCommits, mockBuild, mock(Launcher.class), new StreamBuildListener(System.out, Charset.defaultCharset()));
         verify(jiraClientSvc, times(1)).changeWorkflowOfTicket(eq("SSD-101"), eq("Resolve"));
         verify(jiraClientSvc, times(1)).changeWorkflowOfTicket(eq("SSD-102"), eq("Resolve"));
