@@ -22,7 +22,7 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.scm.ChangeLogSet;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.jiraext.JiraExtConfig;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
 import org.kohsuke.stapler.DataBoundConstructor;

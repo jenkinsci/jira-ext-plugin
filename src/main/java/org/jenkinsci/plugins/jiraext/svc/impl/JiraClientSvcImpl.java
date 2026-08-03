@@ -29,7 +29,7 @@ import net.rcarz.jiraclient.RestClient;
 import net.rcarz.jiraclient.Version;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientFactory;
 import org.jenkinsci.plugins.jiraext.svc.JiraClientSvc;
 
